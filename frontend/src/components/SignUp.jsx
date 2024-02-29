@@ -4,25 +4,28 @@ import { Geld } from "./utils/IconGeld";
 // import {StepsetModule} from "stepper-library";
 import { Stepper, Step } from "headless-stepper/components";
 import React from "react";
+// import React, { useState } from 'react';
+// import "./SignUp.css"; // Assuming you have a CSS file for styling
 
 export const SignUp = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const steps = React.useMemo(
-    () => [
-      {
-        label: "Step 1",
-      },
-      { label: "Step 2" },
-      { label: "Step 3" },
-      { label: "Step 4", disabled: true },
-      { label: "Step 5" },
-      { label: "Step 6" },
-    ],
-    []
-  );
-  const { state, nextStep, prevStep, progressProps, stepsProps } = useStepper({
-    steps,
-  });
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = [
+    { label: "Step 1" },
+    { label: "Step 2" },
+    { label: "Step 3" },
+    { label: "Step 4", disabled: true },
+    { label: "Step 5" },
+    { label: "Step 6" },
+  ];
+
+  const nextStep = () => {
+    setCurrentStep((prevStep) => prevStep + 1);
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prevStep) => prevStep - 1);
+  };
+  let loading = true;
   if (isLoading) {
     return (
       <div className="flex justify-center items-center w-full h-[100vh]">
@@ -45,34 +48,45 @@ export const SignUp = () => {
 
       <Step label="Step 3">Step 3 content</Step>
     </Stepper> */}
-      <div className={styles["container"]}>
-        <div>
-          <nav style={{ display: "flex" }}>
-            {stepsProps?.map((step, index) => (
-              <ol key={index}>
-                <a {...step}>{steps[index].label}</a>
-              </ol>
-            ))}
-          </nav>
-        </div>
-        <p>Current step: {state.currentStep}</p>
+      <div className="container">
+        <nav style={{ display: "flex" }}>
+          {steps.map((step, index) => (
+            <ol key={index}>
+              <a
+                className={index === currentStep ? "active" : ""}
+                onClick={() => setCurrentStep(index)}
+              >
+                {step.label}
+              </a>
+            </ol>
+          ))}
+        </nav>
+        <p>Current step: {currentStep}</p>
         <button
           className="py-4 px-3 bg-blue-300"
           onClick={prevStep}
-          disabled={!state.hasPreviousStep}
+          disabled={currentStep === 0}
         >
           Prev
         </button>
-        <button className="py-4 px-3 bg-blue-300" onClick={nextStep}>
+        <button
+          className="py-4 px-3 bg-blue-300"
+          onClick={nextStep}
+          disabled={currentStep === steps.length - 1}
+        >
           Next
         </button>
-        <div className="bg-gray-400 w-100% h-1/2" {...progressProps} />
+        <div
+          className="progress-bar"
+          style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+        />
       </div>
     </div>
   );
 };
 
-// @Component({
+{
+  /* // @Component({
 //     selector: "app",
 //     template: `
 // <stepset [finishBtn]="buttonClass" btnPos="btn-right" containerPos="center" strokeColor="rgb(201, 82, 230)" (submitEvent)="submit()">
@@ -91,6 +105,5 @@ export const SignUp = () => {
 // </stepset>
 // `
 // })
-// export class App {
-
-// }
+// export class App { */
+}

@@ -1,31 +1,22 @@
 import { useState, useStepper } from "react";
 import { Geld } from "./utils/IconGeld";
-// import {Component} from "@angular/core";
-// import {StepsetModule} from "stepper-library";
-import { Stepper, Step } from "headless-stepper/components";
+
 import React from "react";
-// import React, { useState } from 'react';
-// import "./SignUp.css"; // Assuming you have a CSS file for styling
+import Stepper from "../components/Stepper";
+import { IconStep1 } from "./utils/IconStep1";
+import { IconStep2 } from "./utils/IconStep2";
+import { IconStep3 } from "./utils/IconStep3";
 
 export const SignUp = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = [
-    { label: "Step 1" },
-    { label: "Step 2" },
-    { label: "Step 3" },
-    { label: "Step 4", disabled: true },
-    { label: "Step 5" },
-    { label: "Step 6" },
-  ];
+  const numberOfSteps = 3;
+  let nextStep = "Confirm";
+  if (currentStep === 2) {
+    nextStep = "Go to Dashboard";
+  }
 
-  const nextStep = () => {
-    setCurrentStep((prevStep) => prevStep + 1);
-  };
-
-  const prevStep = () => {
-    setCurrentStep((prevStep) => prevStep - 1);
-  };
-  let loading = true;
   if (isLoading) {
     return (
       <div className="flex justify-center items-center w-full h-[100vh]">
@@ -40,70 +31,74 @@ export const SignUp = () => {
     );
   }
   return (
-    <div>
-      {/* <Stepper currentStep={0}>
-      <Step label="Step 1">Step 1 content</Step>
-
-      <Step label="Step 2">Step 2 content</Step>
-
-      <Step label="Step 3">Step 3 content</Step>
-    </Stepper> */}
-      <div className="container">
-        <nav style={{ display: "flex" }}>
-          {steps.map((step, index) => (
-            <ol key={index}>
-              <a
-                className={index === currentStep ? "active" : ""}
-                onClick={() => setCurrentStep(index)}
-              >
-                {step.label}
-              </a>
-            </ol>
-          ))}
-        </nav>
-        <p>Current step: {currentStep}</p>
-        <button
-          className="py-4 px-3 bg-blue-300"
-          onClick={prevStep}
+    <div className="flex flex-col items-center h-[100vh] justify-center gap-10 relative">
+      <div className="flex flex-col items-center gap-5 absolute z-1 top-[70px]">
+        <Geld width="94" heigth="36"></Geld>
+        <Stepper currentStep={currentStep} numberOfSteps={numberOfSteps} />
+      </div>
+      {currentStep === 0 && (
+        <div className="w-[500px] flex flex-col items-center gap-6">
+          <div className="flex flex-col gap-4 items-center mb-4">
+            <IconStep1></IconStep1>
+            <h3 className="font-bold text-lg">Select base currency</h3>
+          </div>
+          <select className="select select-bordered w-full max-w-xs">
+            <option value="mnt">MNT-Mongolian Tugrik</option>
+            <option value="usd">USD</option>
+          </select>
+          <p className="text-gray-500 text-center">
+            Your base currency should be the one you use most often. All
+            transaction in other currencies will be calculated based on this one{" "}
+          </p>
+        </div>
+      )}
+      {currentStep === 1 && (
+        <div className="w-[500px] flex flex-col items-center gap-6">
+          <div className="flex flex-col gap-4 items-center mb-4">
+            <IconStep2></IconStep2>
+            <h3 className="font-bold text-lg">Set up your cash Balance</h3>
+          </div>
+          <input
+            type="text"
+            placeholder="Email"
+            className="input input-bordered w-full max-w-xs"
+          />
+          <p className="text-gray-500 text-center">
+            How much cash do you have in your wallet
+          </p>
+        </div>
+      )}
+      {currentStep === 2 && (
+        <div className="w-[500px] flex flex-col items-center gap-6">
+          <div className="flex flex-col gap-4 items-center mb-4">
+            <IconStep3></IconStep3>
+            <h3 className="font-bold text-lg">Good Job!</h3>
+          </div>
+          <input
+            type="text"
+            placeholder="Email"
+            className="input input-bordered w-full max-w-xs"
+          />
+          <p className="text-gray-500 text-center">
+            How much cash do you have in your wallet
+          </p>
+        </div>
+      )}
+      <div>
+        {/* <button
+          onClick={() => setCurrentStep(currentStep - 1)}
           disabled={currentStep === 0}
         >
-          Prev
-        </button>
+          Previous step
+        </button> */}
         <button
-          className="py-4 px-3 bg-blue-300"
-          onClick={nextStep}
-          disabled={currentStep === steps.length - 1}
+          onClick={() => setCurrentStep(currentStep + 1)}
+          // disabled={currentStep === numberOfSteps - 1}
+          className="btn btn-primary w-[500px]"
         >
-          Next
+          {nextStep}
         </button>
-        <div
-          className="progress-bar"
-          style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-        />
       </div>
     </div>
   );
 };
-
-{
-  /* // @Component({
-//     selector: "app",
-//     template: `
-// <stepset [finishBtn]="buttonClass" btnPos="btn-right" containerPos="center" strokeColor="rgb(201, 82, 230)" (submitEvent)="submit()">
-//   <step title="Personal Info">
-//     <form #form1="ngForm">
-//       <div class="form-group">
-//         <label>Name</label>
-//         <input placeholder="Name" name="form11" [(ngModel)]="dummyform.fname" required>
-//       </div>
-//       <div class="form-group">
-//         <label>Email</label>
-//         <input placeholder="Email" name="email" [(ngModel)]="dummyform.email" required>
-//       </div>
-//     </form>
-//   </step>
-// </stepset>
-// `
-// })
-// export class App { */
-}

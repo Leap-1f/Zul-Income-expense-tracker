@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/router";
 import { Geld } from "./utils/IconGeld";
 import Link from "next/link";
@@ -6,20 +6,22 @@ import Link from "next/link";
 import React from "react";
 import Stepper from "../components/Stepper";
 import { StepOne, StepTwo, StepThree } from "../components/login/index";
+import { Context } from "./utils/context";
 
 export const SignUp = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const {isLoading, startLoading} = useContext(Context)
+  // const [isLoading, setIsLoading] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(0);
   const numberOfSteps = 3;
   const {push} = useRouter();
 
-  const startLoading = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  };
+  // const startLoading = () => {
+  //   setIsLoading(true);
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 1000);
+  // };
   const confirm = () => {
     setCurrentStep(currentStep + 1);
     if (currentStep === 2) {

@@ -13,7 +13,7 @@ export const LogIn = () => {
   });
 
   const { push } = useRouter();
-  const API_URL = "http://localhost:9090/user";
+  const API_URL = "http://localhost:9090/users";
   const handleSignUp = () => {
     setSignUp(true);
   };

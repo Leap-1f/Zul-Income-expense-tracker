@@ -1,5 +1,5 @@
-import postgres from 'postgres';
-import dotenv from 'dotenv';
+import postgres from "postgres";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -7,13 +7,13 @@ console.log(process.env.PGUSER);
 
 let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
- export const sql = postgres({
+export const sql = postgres({
   host: PGHOST,
   database: PGDATABASE,
   username: PGUSER,
   password: PGPASSWORD,
   port: 5432,
-  ssl: 'require',
+  ssl: "require",
   connection: {
     options: `project=${ENDPOINT_ID}`,
   },

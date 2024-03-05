@@ -1,8 +1,8 @@
 import { sql } from "../../config/database.js";
-let tableName = "users";
+let tableName = "category";
 
 
-export const getAllUsers = async (req, res) => {
+export const getAllCategories = async (req, res) => {
   try {
     const data = await sql`SELECT * FROM ${tableName}`;
     console.log(data);
@@ -12,11 +12,11 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-export const postUser = async (req, res) => {
+export const postCategory = async (req, res) => {
   try{const data = await sql`SELECT * FROM ${tableName}`;
-  const newUser =
+  const newCategory =
     await sql`INSERT INTO ${tableName}(name, email) VALUES(${req.body.name}, ${req.body.email}) RETURNING *`;
-  data.push(newUser);
+  data.push(newCategory);
   console.log(data);
   res.send(data);
 } catch(err){
@@ -25,7 +25,7 @@ export const postUser = async (req, res) => {
   
 };
 export const createTable = async(req, res) => {
-  try{const data = await sql`CREATE TABLE ${tableName}(id SERIAL PRIMARY KEY, email TEXT UNIQUE NOT NULL, name TEXT NOT NULL, password TEXT, avatar_img TEXT, createdAt TIMESTAMP, updatedAt TIMESTAMP, currency_type TEXT DEFAULT 'MNT')`;
+  try{const data = await sql`CREATE TABLE category(id SERIAL PRIMARY KEY, name TEXT, description TEXT, createdAt TIMESTAMP, updatedAt TIMESTAMP, category_image text);`;
     console.log(data);
     res.send(`${tableName} table is created`);
 } catch(err) {

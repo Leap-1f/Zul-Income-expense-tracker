@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/router";
 import { Geld } from "./utils/IconGeld";
-import Link from "next/link";
 
 import React from "react";
 import Stepper from "../components/Stepper";
@@ -9,19 +8,15 @@ import { StepOne, StepTwo, StepThree } from "../components/login/index";
 import { Context } from "./utils/context";
 
 export const SignUp = () => {
-  const {isLoading, startLoading} = useContext(Context)
-  // const [isLoading, setIsLoading] = useState(false);
-
+  const { isLoading, startLoading } = useContext(Context);
   const [currentStep, setCurrentStep] = useState(0);
-  const numberOfSteps = 3;
-  const {push} = useRouter();
 
-  // const startLoading = () => {
-  //   setIsLoading(true);
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 1000);
-  // };
+  const numberOfSteps = 3;
+  const confirmButton = () => {
+    return currentStep === 2 ? "Return to login" : "Confirm";
+  };
+  const { push } = useRouter();
+
   const confirm = () => {
     setCurrentStep(currentStep + 1);
     if (currentStep === 2) {
@@ -70,27 +65,8 @@ export const SignUp = () => {
           // disabled={currentStep === numberOfSteps - 1}
           className="btn btn-primary w-[500px]"
         >
-          Confirm
+          {confirmButton()}
         </button>
-        {/* {currentStep === 2 ? (
-          <Link href="/" condition={currentStep}>
-            <button
-              onClick={startLoading}
-              // disabled={currentStep === numberOfSteps - 1}
-              className="btn btn-primary w-[500px]"
-            >
-              Confirm
-            </button>
-          </Link>
-        ) : (
-          <button
-            onClick={() => setCurrentStep(currentStep + 1)}
-            // disabled={currentStep === numberOfSteps - 1}
-            className="btn btn-primary w-[500px]"
-          >
-            Confirm
-          </button>
-        )} */}
       </div>
     </div>
   );

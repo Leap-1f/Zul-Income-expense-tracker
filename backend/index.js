@@ -9,9 +9,9 @@ const port = 9090;
 app.use(cors());
 app.use(express.json());
 
-app.use("/users", user);
-app.use("/category", category);
-app.use("/transaction", transaction);
+app.use("/api", user);
+app.use("/api/category", category);
+app.use("/api/transaction", transaction);
 
 
 app.listen(port, () => {

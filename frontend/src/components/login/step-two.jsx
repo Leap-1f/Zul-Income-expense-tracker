@@ -9,7 +9,7 @@ export const StepTwo = () => {
     </div>
     <input
       type="text"
-      placeholder="Cash"
+      placeholder="Amount"
       className="input input-bordered w-full max-w-xs"
     />
     <p className="text-gray-500 text-center">

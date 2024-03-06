@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { Geld } from "./utils/IconGeld";
-import Link from "next/link";
 import { useRouter } from "next/router";
+import { signUpSchema } from "./validationSchema";
+import {
+  Formik,
+  Field,
+  useField,
+  ErrorMessage,
+  useFormik,
+  FormikProvider,
+} from "formik";
 
 export const LogIn = () => {
   const [signUp, setSignUp] = useState(false);
@@ -19,7 +27,20 @@ export const LogIn = () => {
   });
 
   const { push } = useRouter();
-  const API_URL = "http://localhost:9090/users";
+  const API_URL = "http://localhost:9090/api/signup";
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      password: "",
+      email: "",
+      rePassword: "",
+    },
+    validationSchema: signUpSchema,
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
   const handleSignUp = () => {
     setSignUp(true);
   };
@@ -39,7 +60,7 @@ export const LogIn = () => {
         password: value,
       });
     }
-  }
+  };
   const handleChangeSignUpInput = (event) => {
     const { value, name } = event.target;
     if (name == "email") {
@@ -52,14 +73,12 @@ export const LogIn = () => {
         ...signUpUserInfo,
         password: value,
       });
-    }
-    else if (name == "re-password") {
+    } else if (name == "re-password") {
       setSignUpUserInfo({
         ...signUpUserInfo,
         rePassword: value,
       });
-    }
-    else if (name == "name") {
+    } else if (name == "name") {
       setSignUpUserInfo({
         ...signUpUserInfo,
         name: value,
@@ -97,19 +116,41 @@ export const LogIn = () => {
       }
     });
   };
-  const signUpLogIn = async (event) => {
+  const signUpButton = async (event) => {
     event.preventDefault();
+    // try {
+    //   await signUpSchema.validate(signUpUserInfo, {
+    //     abortEarly: false,
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    // }
     try {
-      await signUpSchema.validate(signUpUserInfo, { abortEarly: false });
-      // If validation passes, proceed with the sign-up logic
-      // For example, create a new user in the database
-      // If successful, redirect to the sign-up page or dashboard
+      const res = await fetch(API_URL, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(signUpUserInfo),
+      });
+      const data = await res.json();
+      console.log(data);
       push("/sign-up");
-   } catch (error) {
-      console.log(error.errors); // Handle validation errors
-   }
+    } catch (err) {
+      console.log(err);
+    }
   };
   console.log(matched);
+  const MySpecialField = () => {
+    const [field, meta] = useField("firstName");
+    return (
+      <div>
+        <input {...field} className="border-2" />
+        {meta.touched && meta.error && <div>{meta.error}</div>}
+      </div>
+    );
+  };
   return (
     <div className="flex *:w-1/2 *:h-[100vh]">
       <div className="bg-white flex justify-center items-center">
@@ -163,40 +204,58 @@ export const LogIn = () => {
               <h3 className="mb-3 font-bold">Create Geld account</h3>
               <p>Sign up below to create your Wallet account</p>
             </div>
-            <form className="flex flex-col gap-2 w-full" action="" onSubmit={signUpLogIn}>
-              <input
-              onChange={handleChangeSignUpInput}
-                type="text"
-                placeholder="Name"
-                className="input input-bordered w-full max-w-xs"
-                name="name"
-              />
-              <input
-              onChange={handleChangeSignUpInput}
-                type="text"
-                placeholder="Email"
-                className="input input-bordered w-full max-w-xs"
-                name="email"
-              />
-              <input
-              onChange={handleChangeSignUpInput}
-                type="text"
-                placeholder="Password"
-                className="input input-bordered w-full max-w-xs"
-                name="password"
-              />
-              <input
-              onChange={handleChangeSignUpInput}
-                type="text"
-                placeholder="Re-password"
-                className="input input-bordered w-full max-w-xs"
-                name="rePassword"
-              />
-              {/* <Link href="/sign-up">
-                {" "} */}
-                <button type="submit" class="btn btn-primary w-full">Log in</button>
-              {/* </Link> */}
-            </form>
+            <FormikProvider value={formik}>
+              <form
+                onSubmit={formik.handleSubmit}
+                className="flex flex-col gap-2 w-full"
+                action=""
+              >
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Name"
+                  onChange={formik.handleChange}
+                  className="input input-bordered w-full max-w-xs"
+                  name="name"
+                  value={formik.values.name}
+                />
+                {formik.errors.name && formik.touched.name ? (
+                  <div id="hello">{formik.errors.name}</div>
+                ) : null}
+                <Field
+                  onChange={handleChangeSignUpInput}
+                  type="text"
+                  placeholder="Email"
+                  className="input input-bordered w-full max-w-xs"
+                  name="email"
+                />
+                {/* {props.errors.email && touched.email && (
+                <div id="feedback">{props.errors.email}</div>
+              )} */}
+                <Field
+                  onChange={handleChangeSignUpInput}
+                  type="text"
+                  placeholder="Password"
+                  className="input input-bordered w-full max-w-xs"
+                  name="password"
+                />
+                <Field
+                  onChange={handleChangeSignUpInput}
+                  type="text"
+                  placeholder="Re-password"
+                  className="input input-bordered w-full max-w-xs"
+                  name="rePassword"
+                />
+                {/* <ErrorMessage name="name" component="div" />
+                <ErrorMessage name="email" component="div" />
+                <ErrorMessage name="password" component="div" />
+                <ErrorMessage name="rePassword" component="div" /> */}
+                {/* <MySpecialField/> */}
+                <button type="submit" class="btn btn-primary w-full">
+                  Sign in
+                </button>
+              </form>
+            </FormikProvider>
             <div>
               <p>
                 Already have account?{" "}

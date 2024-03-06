@@ -3,6 +3,6 @@ import { createTable, dropTable, getAllUsers, postUser } from "../controller/use
 
 const user = Router();
 
-user.route("/").get(getAllUsers).post(postUser);
+user.route("/signup").get(getAllUsers).post(postUser);
 user.route("/table").post(createTable).delete(dropTable);
 export { user };

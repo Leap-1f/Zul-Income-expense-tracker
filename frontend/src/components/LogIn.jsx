@@ -11,6 +11,12 @@ export const LogIn = () => {
     email: "",
     password: "",
   });
+  const [signUpUserInfo, setSignUpUserInfo] = useState({
+    name: "",
+    email: "",
+    password: "",
+    rePassword: "",
+  });
 
   const { push } = useRouter();
   const API_URL = "http://localhost:9090/users";
@@ -20,17 +26,43 @@ export const LogIn = () => {
   const handleLogIn = () => {
     setSignUp(false);
   };
-  const handleChangeInput = (event) => {
+  const handleChangeLogInInput = (event) => {
     const { value, name } = event.target;
     if (name == "email") {
       setLogInUserInfo({
         ...logInUserInfo,
         email: value,
       });
-    } else {
+    } else if (name == "password") {
       setLogInUserInfo({
         ...logInUserInfo,
         password: value,
+      });
+    }
+  }
+  const handleChangeSignUpInput = (event) => {
+    const { value, name } = event.target;
+    if (name == "email") {
+      setSignUpUserInfo({
+        ...signUpUserInfo,
+        email: value,
+      });
+    } else if (name == "password") {
+      setSignUpUserInfo({
+        ...signUpUserInfo,
+        password: value,
+      });
+    }
+    else if (name == "re-password") {
+      setSignUpUserInfo({
+        ...signUpUserInfo,
+        rePassword: value,
+      });
+    }
+    else if (name == "name") {
+      setSignUpUserInfo({
+        ...signUpUserInfo,
+        name: value,
       });
     }
   };
@@ -47,7 +79,8 @@ export const LogIn = () => {
   useEffect(() => {
     getUsers();
   }, []);
-  // console.log(users);
+  console.log(users, "users");
+  console.log(logInUserInfo, "loginuserinfo");
 
   const logInToDashboard = (event) => {
     event.preventDefault();
@@ -63,6 +96,18 @@ export const LogIn = () => {
         setmatched(false);
       }
     });
+  };
+  const signUpLogIn = async (event) => {
+    event.preventDefault();
+    try {
+      await signUpSchema.validate(signUpUserInfo, { abortEarly: false });
+      // If validation passes, proceed with the sign-up logic
+      // For example, create a new user in the database
+      // If successful, redirect to the sign-up page or dashboard
+      push("/sign-up");
+   } catch (error) {
+      console.log(error.errors); // Handle validation errors
+   }
   };
   console.log(matched);
   return (
@@ -81,14 +126,14 @@ export const LogIn = () => {
               onSubmit={logInToDashboard}
             >
               <input
-                onChange={handleChangeInput}
+                onChange={handleChangeLogInInput}
                 type="text"
                 placeholder="Email"
                 className="input input-bordered w-full max-w-xs"
                 name="email"
               />
               <input
-                onChange={handleChangeInput}
+                onChange={handleChangeLogInInput}
                 type="text"
                 placeholder="Password"
                 className="input input-bordered w-full max-w-xs"
@@ -118,31 +163,39 @@ export const LogIn = () => {
               <h3 className="mb-3 font-bold">Create Geld account</h3>
               <p>Sign up below to create your Wallet account</p>
             </div>
-            <form className="flex flex-col gap-2 w-full" action="">
+            <form className="flex flex-col gap-2 w-full" action="" onSubmit={signUpLogIn}>
               <input
+              onChange={handleChangeSignUpInput}
                 type="text"
                 placeholder="Name"
                 className="input input-bordered w-full max-w-xs"
+                name="name"
               />
               <input
+              onChange={handleChangeSignUpInput}
                 type="text"
                 placeholder="Email"
                 className="input input-bordered w-full max-w-xs"
+                name="email"
               />
               <input
+              onChange={handleChangeSignUpInput}
                 type="text"
                 placeholder="Password"
                 className="input input-bordered w-full max-w-xs"
+                name="password"
               />
               <input
+              onChange={handleChangeSignUpInput}
                 type="text"
                 placeholder="Re-password"
                 className="input input-bordered w-full max-w-xs"
+                name="rePassword"
               />
-              <Link href="/sign-up">
-                {" "}
-                <button class="btn btn-primary w-full">Log in</button>
-              </Link>
+              {/* <Link href="/sign-up">
+                {" "} */}
+                <button type="submit" class="btn btn-primary w-full">Log in</button>
+              {/* </Link> */}
             </form>
             <div>
               <p>

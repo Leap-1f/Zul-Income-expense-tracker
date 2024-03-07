@@ -15,6 +15,7 @@ export const LogIn = () => {
   const [signUp, setSignUp] = useState(false);
   const [users, setUsers] = useState([]);
   const [matched, setmatched] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
   const [logInUserInfo, setLogInUserInfo] = useState({
     email: "",
     password: "",
@@ -27,7 +28,6 @@ export const LogIn = () => {
   });
 
   const { push } = useRouter();
-  const API_URL = "http://localhost:9090/api/signup";
 
   const formikSignUp = useFormik({
     initialValues: {
@@ -40,7 +40,7 @@ export const LogIn = () => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        const res = await fetch(API_URL, {
+        const res = await fetch("http://localhost:9090/api/signup", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -62,42 +62,39 @@ export const LogIn = () => {
       password: "",
     },
     validationSchema: loginSchema,
-    onSubmit: (values) => {
-      console.log(values);
-      // event.preventDefault();
-      users.forEach((el) => {
-        if (
-          el.email === values.email &&
-          el.password === values.password
-        ) {
-          setmatched(true);
+    onSubmit: async (values) => {
+      console.log(values, "this is values");
+
+      try {
+        const res = await fetch("http://localhost:9090/api/login", {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify(values),
+        });
+        const data = await res.json();
+        console.log(data);
+        if (data.message === "success") {
           push("/dashboard");
-          console.log("correct");
-        } else {
-          setmatched(false);
+        } else if (data.message === "failed") {
+          setWarningMessage("failed");
+        } else if (data.message === "nodata") {
+          setWarningMessage("nodata");
         }
-      });
-    }
-  })
+        
+      } catch (err) {
+        setWarningMessage(err);
+        console.log(err);
+      }
+    },
+  });
   const handleSignUp = () => {
     setSignUp(true);
   };
   const handleLogIn = () => {
     setSignUp(false);
-  };
-  const handleChangeLogInInput = (event) => {
-    const { value, name } = event.target;
-    if (name == "email") {
-      setLogInUserInfo({
-        ...logInUserInfo,
-        email: value,
-      });
-    } else if (name == "password") {
-      setLogInUserInfo({
-        ...logInUserInfo,
-        password: value,
-      });
-    }
   };
 
   const getUsers = async () => {
@@ -112,25 +109,8 @@ export const LogIn = () => {
   useEffect(() => {
     getUsers();
   }, []);
-  console.log(users, "users");
 
-  const logInToDashboard = (event) => {
-    event.preventDefault();
-    users.forEach((el) => {
-      if (
-        el.email === logInUserInfo.email &&
-        el.password === logInUserInfo.password
-      ) {
-        setmatched(true);
-        push("/dashboard");
-        console.log("correct");
-      } else {
-        setmatched(false);
-      }
-    });
-  };
-  
-  console.log(matched);
+  // console.log(matched);
 
   return (
     <div className="flex *:w-1/2 *:h-[100vh]">
@@ -143,37 +123,42 @@ export const LogIn = () => {
               <p>Welcome back, Please enter your details</p>
             </div>
             <FormikProvider value={formikLogIn}>
-            <form
-              className="flex flex-col gap-2 w-full"
-              action=""
-              onSubmit={formikLogIn.handleSubmit}
-            >
-              <input
-                onChange={formikLogIn.handleChange}
-                type="text"
-                placeholder="Email"
-                className="input input-bordered w-full max-w-xs"
-                name="email"
-                value={formikLogIn.values.email}
-              />
-              {formikLogIn.errors.email && formikLogIn.touched.email ? (
-                  <div className="text-red-500 text-xs" id="">{formikLogIn.errors.email}</div>
+              <form
+                className="flex flex-col gap-2 w-full"
+                action=""
+                onSubmit={formikLogIn.handleSubmit}
+              >
+                <input
+                  onChange={formikLogIn.handleChange}
+                  type="text"
+                  placeholder="Email"
+                  className="input input-bordered w-full max-w-xs"
+                  name="email"
+                  value={formikLogIn.values.email}
+                />
+                {formikLogIn.errors.email && formikLogIn.touched.email ? (
+                  <div className="text-red-500 text-xs" id="">
+                    {formikLogIn.errors.email}
+                  </div>
                 ) : null}
-              <input
-                onChange={formikLogIn.handleChange}
-                type="text"
-                placeholder="Password"
-                className="input input-bordered w-full max-w-xs"
-                name="password"
-                value={formikLogIn.values.password}
-              />
-              {formikLogIn.errors.password && formikLogIn.touched.password ? (
-                  <div className="text-red-500 text-xs" id="">{formikLogIn.errors.password}</div>
+                <input
+                  onChange={formikLogIn.handleChange}
+                  type="text"
+                  placeholder="Password"
+                  className="input input-bordered w-full max-w-xs"
+                  name="password"
+                  value={formikLogIn.values.password}
+                />
+                {formikLogIn.errors.password && formikLogIn.touched.password ? (
+                  <div className="text-red-500 text-xs" id="">
+                    {formikLogIn.errors.password}
+                  </div>
                 ) : null}
-              <button type="submit" class="btn btn-primary w-full">
-                Log in
-              </button>
-            </form>
+                {warningMessage  &&  <p>{warningMessage}</p>}
+                <button type="submit" class="btn btn-primary w-full">
+                  Log in
+                </button>
+              </form>
             </FormikProvider>
             <div>
               <p>
@@ -211,7 +196,9 @@ export const LogIn = () => {
                   value={formikSignUp.values.name}
                 />
                 {formikSignUp.errors.name && formikSignUp.touched.name ? (
-                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.name}</div>
+                  <div className="text-red-500 text-xs" id="">
+                    {formikSignUp.errors.name}
+                  </div>
                 ) : null}
                 <input
                   onChange={formikSignUp.handleChange}
@@ -221,7 +208,9 @@ export const LogIn = () => {
                   name="email"
                 />
                 {formikSignUp.errors.email && formikSignUp.touched.email ? (
-                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.email}</div>
+                  <div className="text-red-500 text-xs" id="">
+                    {formikSignUp.errors.email}
+                  </div>
                 ) : null}
                 <input
                   onChange={formikSignUp.handleChange}
@@ -230,8 +219,11 @@ export const LogIn = () => {
                   className="input input-bordered w-full max-w-xs"
                   name="password"
                 />
-                {formikSignUp.errors.password && formikSignUp.touched.password ? (
-                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.password}</div>
+                {formikSignUp.errors.password &&
+                formikSignUp.touched.password ? (
+                  <div className="text-red-500 text-xs" id="">
+                    {formikSignUp.errors.password}
+                  </div>
                 ) : null}
                 <input
                   onChange={formikSignUp.handleChange}
@@ -240,8 +232,11 @@ export const LogIn = () => {
                   className="input input-bordered w-full max-w-xs"
                   name="rePassword"
                 />
-                {formikSignUp.errors.rePassword && formikSignUp.touched.rePassword ? (
-                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.rePassword}</div>
+                {formikSignUp.errors.rePassword &&
+                formikSignUp.touched.rePassword ? (
+                  <div className="text-red-500 text-xs" id="">
+                    {formikSignUp.errors.rePassword}
+                  </div>
                 ) : null}
                 <button type="submit" class="btn btn-primary w-full">
                   Sign in

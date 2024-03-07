@@ -1,10 +1,11 @@
 import { sql } from "../../config/database.js";
-const tableName = "users";
+import bcryct from "bcrypt";
+
 export const getAllUsers = async (req, res) => {
   console.log("__________");
 
   try {
-    const data = await sql`SELECT * FROM ${sql(tableName)}`;
+    const data = await sql`SELECT * FROM users`;
     res.send(data);
   } catch (err) {
     console.log(err);
@@ -13,34 +14,33 @@ export const getAllUsers = async (req, res) => {
 
 export const postUser = async (req, res) => {
   try {
-    const data = await sql`SELECT * FROM ${sql(tableName)}`;
-    const newUser = await sql`INSERT INTO ${sql(
-      tableName
-    )}(email, name, password) VALUES(${req.body.email}, ${req.body.name}, ${
-      req.body.password
-    }) RETURNING *`;
+    const { name, password, email } = req.body;
+    const salt = bcryct.genSaltSync(1);
+    const hashedPassword = await bcryct.hash(password, salt);
+    const data = await sql`SELECT * FROM users`;
+    const newUser =
+      await sql`INSERT INTO users(email, name, password) VALUES(${email}, ${name}, ${hashedPassword}) RETURNING *`;
     data.push(newUser);
-    console.log(data);
     res.send(data);
   } catch (err) {
-    console.log(err);
+    console.log(err, "hellooo");
   }
 };
+
 export const createTable = async (req, res) => {
   try {
-    const data = await sql`CREATE TABLE ${sql(
-      tableName
-    )}(id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), 
+    const data =
+      await sql`CREATE TABLE users(id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), 
       email VARCHAR(50) UNIQUE NOT NULL, 
       name VARCHAR(50) NOT NULL, 
-      password TEXT NOT NULL, 
+      password VARCHAR(255) NOT NULL, 
       avatar_img TEXT, 
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
       updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
       currency_type TEXT DEFAULT 'MNT',
       amount INT NOT NULL)`;
     console.log(data);
-    res.send(`${tableName} table is created`);
+    res.send(`users table is created`);
   } catch (err) {
     console.log(err);
   }
@@ -48,9 +48,9 @@ export const createTable = async (req, res) => {
 
 export const dropTable = async (req, res) => {
   try {
-    const data = await sql`DROP TABLE ${sql(tableName)}`;
+    const data = await sql`DROP TABLE users`;
     console.log(data);
-    res.send(`${tableName} table was deleted`);
+    res.send(`users table was deleted`);
   } catch (err) {
     console.log(err);
   }
@@ -58,19 +58,27 @@ export const dropTable = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const data = await sql`SELECT * FROM ${sql(tableName)} where email=${
-      req.body.email
-    }`;
-
+    const { email, password } = req.body;
+    const data = await sql`SELECT * FROM users where email=${email}`;
+    console.log(data);
+    const isValid = await bcryct.compare(password, data[0].password);
     if (data.length === 0) {
-      res.send("burtgelgui mail hayg baina");
+      res.send({
+        message: "nodata",
+        data: null,
+      });
       return;
     }
-
-    if (data[0].password === req.body.password) {
-      res.send("amjilttai newterlee");
+    if (isValid) {
+      res.send({
+        message: "success",
+        data: data,
+      });
     } else {
-      res.send("password buruu baina");
+      res.send({
+        message: "failed",
+        data: null,
+      });
     }
   } catch (err) {
     console.log(err);

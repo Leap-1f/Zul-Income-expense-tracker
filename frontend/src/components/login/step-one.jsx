@@ -8,8 +8,8 @@ export const StepOne = () => {
         <h3 className="font-bold text-lg">Select base currency</h3>
       </div>
       <select className="select select-bordered w-full max-w-xs">
-        <option value="mnt">MNT-Mongolian Tugrik</option>
-        <option value="usd">USD</option>
+        <option value="MNT">MNT-Mongolian Tugrik</option>
+        <option value="USD">USD-United States dollar</option>
       </select>
       <p className="text-gray-500 text-center">
         Your base currency should be the one you use most often. All transaction

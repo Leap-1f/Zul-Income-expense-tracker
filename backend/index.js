@@ -9,7 +9,7 @@ const port = 9090;
 app.use(cors());
 app.use(express.json());
 
-app.use("/api", user);
+app.use("/api/", user);
 app.use("/api/category", category);
 app.use("/api/transaction", transaction);
 

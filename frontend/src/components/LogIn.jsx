@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Geld } from "./utils/IconGeld";
 import { useRouter } from "next/router";
-import { signUpSchema } from "./validationSchema";
+import { loginSchema, signUpSchema } from "./validationSchema";
 import {
   Formik,
   Field,
@@ -29,7 +29,7 @@ export const LogIn = () => {
   const { push } = useRouter();
   const API_URL = "http://localhost:9090/api/signup";
 
-  const formik = useFormik({
+  const formikSignUp = useFormik({
     initialValues: {
       name: "",
       password: "",
@@ -37,10 +37,48 @@ export const LogIn = () => {
       rePassword: "",
     },
     validationSchema: signUpSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       console.log(values);
+      try {
+        const res = await fetch(API_URL, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify(values),
+        });
+        const data = await res.json();
+        console.log(data);
+        push("/sign-up");
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
+  const formikLogIn = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+    onSubmit: (values) => {
+      console.log(values);
+      // event.preventDefault();
+      users.forEach((el) => {
+        if (
+          el.email === values.email &&
+          el.password === values.password
+        ) {
+          setmatched(true);
+          push("/dashboard");
+          console.log("correct");
+        } else {
+          setmatched(false);
+        }
+      });
+    }
+  })
   const handleSignUp = () => {
     setSignUp(true);
   };
@@ -61,31 +99,7 @@ export const LogIn = () => {
       });
     }
   };
-  const handleChangeSignUpInput = (event) => {
-    const { value, name } = event.target;
-    if (name == "email") {
-      setSignUpUserInfo({
-        ...signUpUserInfo,
-        email: value,
-      });
-    } else if (name == "password") {
-      setSignUpUserInfo({
-        ...signUpUserInfo,
-        password: value,
-      });
-    } else if (name == "re-password") {
-      setSignUpUserInfo({
-        ...signUpUserInfo,
-        rePassword: value,
-      });
-    } else if (name == "name") {
-      setSignUpUserInfo({
-        ...signUpUserInfo,
-        name: value,
-      });
-    }
-  };
-  // console.log(logInUserInfo, "input userinfo");
+
   const getUsers = async () => {
     try {
       const res = await fetch(API_URL);
@@ -99,7 +113,6 @@ export const LogIn = () => {
     getUsers();
   }, []);
   console.log(users, "users");
-  console.log(logInUserInfo, "loginuserinfo");
 
   const logInToDashboard = (event) => {
     event.preventDefault();
@@ -116,41 +129,9 @@ export const LogIn = () => {
       }
     });
   };
-  const signUpButton = async (event) => {
-    event.preventDefault();
-    // try {
-    //   await signUpSchema.validate(signUpUserInfo, {
-    //     abortEarly: false,
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    try {
-      const res = await fetch(API_URL, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify(signUpUserInfo),
-      });
-      const data = await res.json();
-      console.log(data);
-      push("/sign-up");
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  
   console.log(matched);
-  const MySpecialField = () => {
-    const [field, meta] = useField("firstName");
-    return (
-      <div>
-        <input {...field} className="border-2" />
-        {meta.touched && meta.error && <div>{meta.error}</div>}
-      </div>
-    );
-  };
+
   return (
     <div className="flex *:w-1/2 *:h-[100vh]">
       <div className="bg-white flex justify-center items-center">
@@ -161,29 +142,39 @@ export const LogIn = () => {
               <h3 className="mb-3 font-bold">Welcome Back</h3>
               <p>Welcome back, Please enter your details</p>
             </div>
+            <FormikProvider value={formikLogIn}>
             <form
               className="flex flex-col gap-2 w-full"
               action=""
-              onSubmit={logInToDashboard}
+              onSubmit={formikLogIn.handleSubmit}
             >
               <input
-                onChange={handleChangeLogInInput}
+                onChange={formikLogIn.handleChange}
                 type="text"
                 placeholder="Email"
                 className="input input-bordered w-full max-w-xs"
                 name="email"
+                value={formikLogIn.values.email}
               />
+              {formikLogIn.errors.email && formikLogIn.touched.email ? (
+                  <div className="text-red-500 text-xs" id="">{formikLogIn.errors.email}</div>
+                ) : null}
               <input
-                onChange={handleChangeLogInInput}
+                onChange={formikLogIn.handleChange}
                 type="text"
                 placeholder="Password"
                 className="input input-bordered w-full max-w-xs"
                 name="password"
+                value={formikLogIn.values.password}
               />
+              {formikLogIn.errors.password && formikLogIn.touched.password ? (
+                  <div className="text-red-500 text-xs" id="">{formikLogIn.errors.password}</div>
+                ) : null}
               <button type="submit" class="btn btn-primary w-full">
                 Log in
               </button>
             </form>
+            </FormikProvider>
             <div>
               <p>
                 Dont have account?{" "}
@@ -204,53 +195,54 @@ export const LogIn = () => {
               <h3 className="mb-3 font-bold">Create Geld account</h3>
               <p>Sign up below to create your Wallet account</p>
             </div>
-            <FormikProvider value={formik}>
+            <FormikProvider value={formikSignUp}>
               <form
-                onSubmit={formik.handleSubmit}
+                onSubmit={formikSignUp.handleSubmit}
                 className="flex flex-col gap-2 w-full"
                 action=""
               >
                 <input
-                  id="name"
+                  id=""
                   type="text"
                   placeholder="Name"
-                  onChange={formik.handleChange}
+                  onChange={formikSignUp.handleChange}
                   className="input input-bordered w-full max-w-xs"
                   name="name"
-                  value={formik.values.name}
+                  value={formikSignUp.values.name}
                 />
-                {formik.errors.name && formik.touched.name ? (
-                  <div id="hello">{formik.errors.name}</div>
+                {formikSignUp.errors.name && formikSignUp.touched.name ? (
+                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.name}</div>
                 ) : null}
-                <Field
-                  onChange={handleChangeSignUpInput}
+                <input
+                  onChange={formikSignUp.handleChange}
                   type="text"
                   placeholder="Email"
                   className="input input-bordered w-full max-w-xs"
                   name="email"
                 />
-                {/* {props.errors.email && touched.email && (
-                <div id="feedback">{props.errors.email}</div>
-              )} */}
-                <Field
-                  onChange={handleChangeSignUpInput}
+                {formikSignUp.errors.email && formikSignUp.touched.email ? (
+                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.email}</div>
+                ) : null}
+                <input
+                  onChange={formikSignUp.handleChange}
                   type="text"
                   placeholder="Password"
                   className="input input-bordered w-full max-w-xs"
                   name="password"
                 />
-                <Field
-                  onChange={handleChangeSignUpInput}
+                {formikSignUp.errors.password && formikSignUp.touched.password ? (
+                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.password}</div>
+                ) : null}
+                <input
+                  onChange={formikSignUp.handleChange}
                   type="text"
                   placeholder="Re-password"
                   className="input input-bordered w-full max-w-xs"
                   name="rePassword"
                 />
-                {/* <ErrorMessage name="name" component="div" />
-                <ErrorMessage name="email" component="div" />
-                <ErrorMessage name="password" component="div" />
-                <ErrorMessage name="rePassword" component="div" /> */}
-                {/* <MySpecialField/> */}
+                {formikSignUp.errors.rePassword && formikSignUp.touched.rePassword ? (
+                  <div className="text-red-500 text-xs" id="">{formikSignUp.errors.rePassword}</div>
+                ) : null}
                 <button type="submit" class="btn btn-primary w-full">
                   Sign in
                 </button>

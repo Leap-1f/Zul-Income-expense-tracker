@@ -26,7 +26,15 @@ export const postTransaction = async (req, res) => {
 export const createTable = async (req, res) => {
   try {
     const data =
-      await sql`CREATE TABLE ${sql(tableName)}(id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid REFERENCES users(id), name TEXT, amount REAL NOT NULL, transaction_type transaction_type, description TEXT, createdAt TIMESTAMP DEFAULT NOW(), updatedAt TIMESTAMP DEFAULT NOW(), category_id uuid REFERENCES category(id))`;
+      await sql`CREATE TABLE ${sql(tableName)}(id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), 
+      user_id uuid REFERENCES users(id), 
+      name TEXT, 
+      amount REAL NOT NULL, 
+      transaction_type VARCHAR(3) CHECK (transaction_type IN ('INC', 'EXP')), 
+      description TEXT, 
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+      updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+      category_id uuid REFERENCES category(id))`;
     console.log(data);
     res.send(`${tableName} table is created`);
   } catch (err) {

@@ -25,7 +25,12 @@ export const postCategory = async (req, res) => {
   
 };
 export const createTable = async(req, res) => {
-  try{const data = await sql`CREATE TABLE ${sql(tableName)}(id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name VARCHAR(100), description TEXT, createdAt TIMESTAMP, updatedAt TIMESTAMP, category_image text);`;
+  try{const data = await sql`CREATE TABLE ${sql(tableName)}(id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), 
+  name VARCHAR(100), 
+  description TEXT, 
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+  category_image text);`;
     console.log(data);
     res.send(`${tableName} table is created`);
 } catch(err) {

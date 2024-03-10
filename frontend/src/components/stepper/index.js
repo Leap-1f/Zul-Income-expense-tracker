@@ -1,13 +1,17 @@
-export default function Stepper({ currentStep, numberOfSteps }) {
+export * from "./step-one";
+export * from "./step-two";
+export * from "./step-three";
+
+export function Stepper({ currentStep, numberOfSteps }) {
   let number = 1;
 
   return (
     <div>
-      <div className="flex items-center">
+      <div className="flex items-center mt-2">
         {Array.from({ length: numberOfSteps }).map((_, index) => (
           <>
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full ${
+              className={`w-8 h-8 flex items-center justify-center rounded-full ${
                 index <= currentStep ? "bg-blue-600" : "bg-gray-300"
               }`}
             >

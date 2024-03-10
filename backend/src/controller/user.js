@@ -14,14 +14,14 @@ export const getAllUsers = async (req, res) => {
 
 export const postUser = async (req, res) => {
   try {
-    const { name, password, email } = req.body;
+    const { name, password, email, currencyType, amount } = req.body;
     const salt = bcryct.genSaltSync(1);
     const hashedPassword = await bcryct.hash(password, salt);
     const data = await sql`SELECT * FROM users`;
     const newUser =
-      await sql`INSERT INTO users(email, name, password) VALUES(${email}, ${name}, ${hashedPassword}) RETURNING *`;
+      await sql`INSERT INTO users(email, name, password, currency_type, amount) VALUES(${email}, ${name}, ${hashedPassword}, ${currencyType}, ${amount}) RETURNING *`;
     data.push(newUser);
-    res.send(data);
+    res.send({ success: true, statusCode: 201 });
   } catch (err) {
     console.log(err, "hellooo");
   }
@@ -60,8 +60,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const data = await sql`SELECT * FROM users where email=${email}`;
-    console.log(data);
-    const isValid = await bcryct.compare(password, data[0].password);
+    console.log(data, "data");
     if (data.length === 0) {
       res.send({
         message: "nodata",
@@ -69,16 +68,34 @@ export const login = async (req, res) => {
       });
       return;
     }
+    const isValid = await bcryct.compare(password, data[0].password);
     if (isValid) {
       res.send({
-        message: "success",
-        data: data,
+        success: true,
+        statusCode: 200,
+        user: { userId: data.id, email: data.email, password: data.password },
       });
     } else {
       res.send({
         message: "failed",
         data: null,
       });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const signin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const data = await sql`SELECT * FROM users where email=${email}`;
+    console.log(data);
+    if (data.length === 1) {
+      res.send({
+        message: "This email is registered.",
+      });
+    } else if (data.length === 0) {
+      res.send({ success: true, statusCode: 200 });
     }
   } catch (err) {
     console.log(err);

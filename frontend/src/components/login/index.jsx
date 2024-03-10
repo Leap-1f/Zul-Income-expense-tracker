@@ -1,33 +1,15 @@
-import { useEffect, useState } from "react";
-import { Geld } from "./utils/IconGeld";
+import { useContext, useEffect, useState } from "react";
+import { Geld } from "../utils/IconGeld";
 import { useRouter } from "next/router";
 import { loginSchema, signUpSchema } from "./validationSchema";
-import {
-  Formik,
-  Field,
-  useField,
-  ErrorMessage,
-  useFormik,
-  FormikProvider,
-} from "formik";
+import { useFormik, FormikProvider } from "formik";
+import { Context } from "../utils/context";
 
 export const LogIn = () => {
-  const [signUp, setSignUp] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [matched, setmatched] = useState(false);
-  const [warningMessage, setWarningMessage] = useState("");
-  const [logInUserInfo, setLogInUserInfo] = useState({
-    email: "",
-    password: "",
-  });
-  const [signUpUserInfo, setSignUpUserInfo] = useState({
-    name: "",
-    email: "",
-    password: "",
-    rePassword: "",
-  });
-
   const { push } = useRouter();
+  const [signUp, setSignUp] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
+  const { signUpUserInfo, setSignUpUserInfo } = useContext(Context);
 
   const formikSignUp = useFormik({
     initialValues: {
@@ -40,7 +22,7 @@ export const LogIn = () => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        const res = await fetch("http://localhost:9090/api/signup", {
+        const res = await fetch("http://localhost:9090/api/signin", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -48,9 +30,22 @@ export const LogIn = () => {
           method: "POST",
           body: JSON.stringify(values),
         });
-        const data = await res.json();
-        console.log(data);
-        push("/sign-up");
+        const response = await res.json();
+        console.log(response);
+
+        if (response.message) {
+          setWarningMessage(response.message);
+        }
+        else if (response.success) {
+          setSignUpUserInfo({
+            ...signUpUserInfo,
+            name: values.name,
+            email: values.email,
+            password: values.password,
+          });
+          console.log(signUpUserInfo);
+          push("/sign-up");
+        }
       } catch (err) {
         console.log(err);
       }
@@ -74,43 +69,31 @@ export const LogIn = () => {
           method: "POST",
           body: JSON.stringify(values),
         });
-        const data = await res.json();
-        console.log(data);
-        if (data.message === "success") {
+        const response = await res.json();
+        console.log(response);
+        if (response.success) {
           push("/dashboard");
-        } else if (data.message === "failed") {
-          setWarningMessage("failed");
-        } else if (data.message === "nodata") {
-          setWarningMessage("nodata");
+        } else if (response.message === "failed") {
+          setWarningMessage("Password does not match.");
+        } else if (response.message === "nodata") {
+          setWarningMessage("Unregistered email.");
         }
-        
       } catch (err) {
-        setWarningMessage(err);
         console.log(err);
       }
     },
   });
   const handleSignUp = () => {
     setSignUp(true);
+    setWarningMessage("");
   };
   const handleLogIn = () => {
     setSignUp(false);
-  };
-
-  const getUsers = async () => {
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      setUsers(data);
-    } catch (error) {
-      console.log(error);
-    }
+    setWarningMessage("");
   };
   useEffect(() => {
-    getUsers();
-  }, []);
 
-  // console.log(matched);
+  }, [warningMessage])
 
   return (
     <div className="flex *:w-1/2 *:h-[100vh]">
@@ -154,8 +137,10 @@ export const LogIn = () => {
                     {formikLogIn.errors.password}
                   </div>
                 ) : null}
-                {warningMessage  &&  <p>{warningMessage}</p>}
-                <button type="submit" class="btn btn-primary w-full">
+                {warningMessage && (
+                  <p className="text-red-500 text-xs">{warningMessage}</p>
+                )}
+                <button type="submit" className="btn btn-primary w-full">
                   Log in
                 </button>
               </form>
@@ -238,7 +223,10 @@ export const LogIn = () => {
                     {formikSignUp.errors.rePassword}
                   </div>
                 ) : null}
-                <button type="submit" class="btn btn-primary w-full">
+                {warningMessage && (
+                  <p className="text-red-500 text-xs">{warningMessage}</p>
+                )}
+                <button type="submit" className="btn btn-primary w-full">
                   Sign in
                 </button>
               </form>

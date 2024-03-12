@@ -5,7 +5,7 @@ import { loginSchema, signUpSchema } from "./validationSchema";
 import { useFormik, FormikProvider } from "formik";
 import { Context } from "../utils/context";
 
-const endPointUrl = "http://localhost:9090";
+
 
 //https://zulaa-back.vercel.app/
 
@@ -13,7 +13,7 @@ export const LogIn = () => {
   const { push } = useRouter();
   const [signUp, setSignUp] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-  const { signUpUserInfo, setSignUpUserInfo } = useContext(Context);
+  const { signUpUserInfo, setSignUpUserInfo, endPointUrl } = useContext(Context);
 
   const formikSignUp = useFormik({
     initialValues: {
@@ -64,7 +64,7 @@ export const LogIn = () => {
       console.log(values, "this is values");
 
       try {
-        const res = await fetch("http://localhost:9090/api/login", {
+        const res = await fetch(endPointUrl + "/api/login", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",

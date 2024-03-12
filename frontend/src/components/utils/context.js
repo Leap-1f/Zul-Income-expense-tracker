@@ -3,6 +3,8 @@ import { useState } from "react";
 
 export const Context = createContext([]);
 export const ContextProvider = ({children}) => {
+     // const endPointUrl = "http://localhost:9090";
+     const endPointUrl = "https://zulaa-back.vercel.app/"
      const [isLoading, setIsLoading] = useState(false);
      const [showAddCategory, setShowAddCategory] = useState(false);
      const [showAddCategoryIcons, setShowAddCategoryIcons] = useState(false);
@@ -20,6 +22,6 @@ export const ContextProvider = ({children}) => {
           }, 1000);
         };
      return (
-          <Context.Provider value={{isLoading, signUpUserInfo, showAddCategory, setShowAddCategory, showAddCategoryIcons, setShowAddCategoryIcons, setSignUpUserInfo, startLoading}}>{children}</Context.Provider>
+          <Context.Provider value={{endPointUrl, isLoading, signUpUserInfo, showAddCategory, setShowAddCategory, showAddCategoryIcons, setShowAddCategoryIcons, setSignUpUserInfo, startLoading}}>{children}</Context.Provider>
      )
 }

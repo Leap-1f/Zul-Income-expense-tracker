@@ -8,7 +8,7 @@ import { Context } from "../utils/context";
 import { PreviousButton } from "../utils";
 
 export const SignUp = () => {
-  const { isLoading, startLoading, signUpUserInfo } = useContext(Context);
+  const { endPointUrl, startLoading, signUpUserInfo } = useContext(Context);
   const [currentStep, setCurrentStep] = useState(0);
 
   const numberOfSteps = 3;
@@ -24,7 +24,7 @@ export const SignUp = () => {
       console.log("-----------------");
       console.log(signUpUserInfo);
       try {
-        const res = await fetch("http://localhost:9090/api/signup", {
+        const res = await fetch(endPointUrl + "/api/signup", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",

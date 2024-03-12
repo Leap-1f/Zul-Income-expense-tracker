@@ -24,7 +24,7 @@ export const SignUp = () => {
       console.log("-----------------");
       console.log(signUpUserInfo);
       try {
-        const res = await fetch(endPointUrl + "/api/signup", {
+        const res = await fetch("http://localhost:9090/api/signup", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",

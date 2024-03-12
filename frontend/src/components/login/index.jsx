@@ -26,7 +26,7 @@ export const LogIn = () => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        const res = await fetch(endPointUrl + "/api/signin", {
+        const res = await fetch("http://localhost:9090/api/signin", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const LogIn = () => {
       console.log(values, "this is values");
 
       try {
-        const res = await fetch(endPointUrl + "/api/login", {
+        const res = await fetch("http://localhost:9090/api/login", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",

@@ -1,19 +1,16 @@
 import { useContext, useEffect, useState } from "react";
 import { Geld } from "../utils/IconGeld";
 import { useRouter } from "next/router";
-import { loginSchema, signUpSchema } from "./validationSchema";
+import { loginSchema, signUpSchema } from "./validationSchema.js";
 import { useFormik, FormikProvider } from "formik";
 import { Context } from "../utils/context";
 
-
-
-//https://zulaa-back.vercel.app/
 
 export const LogIn = () => {
   const { push } = useRouter();
   const [signUp, setSignUp] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-  const { signUpUserInfo, setSignUpUserInfo, endPointUrl } = useContext(Context);
+  const { signUpUserInfo, setSignUpUserInfo} = useContext(Context);
 
   const formikSignUp = useFormik({
     initialValues: {
@@ -26,7 +23,7 @@ export const LogIn = () => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        const res = await fetch("https://zulaa-back.vercel.app/api/signin", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_ENDPOINT}/api/signin`, {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -61,11 +58,9 @@ export const LogIn = () => {
     },
     validationSchema: loginSchema,
     onSubmit: async (values) => {
-      console.log(values, "this is values");
-      // const url = "http://localhost:9090";
 
       try {
-        const res = await fetch("https://zulaa-back.vercel.app/api/login", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_ENDPOINT}/api/login`, {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",

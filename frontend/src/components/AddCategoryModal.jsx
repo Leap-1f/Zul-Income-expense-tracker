@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Context } from "./utils/context";
 import { AddRecord } from "./AddRecordModal";
-import { ArrowDropDown, Home } from "./utils/CategoryImg";
+import { ArrowDropDown, Home } from "./utils/CategoryIcons";
 
 export const AddCategoryModal = () => {
   const { setShowAddCategory } = useContext(Context);
@@ -24,7 +24,7 @@ export const AddCategoryModal = () => {
           >
             ✕
           </label> */}
-              <label 
+              <label
                 htmlFor="my_modal_6"
                 className="btn btn-sm btn-circle btn-ghost"
               >

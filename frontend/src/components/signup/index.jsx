@@ -8,7 +8,7 @@ import { Context } from "../utils/context";
 import { PreviousButton } from "../utils";
 
 export const SignUp = () => {
-  const { endPointUrl, startLoading, signUpUserInfo } = useContext(Context);
+  const {startLoading, signUpUserInfo } = useContext(Context);
   const [currentStep, setCurrentStep] = useState(0);
 
   const numberOfSteps = 3;
@@ -56,19 +56,19 @@ export const SignUp = () => {
   }, [currentStep]);
 
   console.log(currentStep, "currentstep");
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex justify-center items-center w-full h-[100vh]">
-  //       <div className="flex flex-col justify-center items-center gap-8">
-  //         <Geld width="200" heigth="80"></Geld>
-  //         <div className="flex flex-col justify-center items-center gap-2">
-  //           <div className="loading loading-spinner loading-md"></div>
-  //           <p>Түр хүлээнэ үү...</p>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center w-full h-[100vh]">
+        <div className="flex flex-col justify-center items-center gap-8">
+          <Geld width="200" heigth="80"></Geld>
+          <div className="flex flex-col justify-center items-center gap-2">
+            <div className="loading loading-spinner loading-md"></div>
+            <p>Түр хүлээнэ үү...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col items-center h-[100vh] justify-center gap-10 relative">
       <div className="flex flex-col items-center gap-5 absolute z-1 top-[30px]">

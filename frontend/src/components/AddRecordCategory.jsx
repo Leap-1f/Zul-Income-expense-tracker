@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { AddCategoryIcon } from "./utils/CategoryImg";
+import { AddCategoryIcon } from "./utils/CategoryIcons";
 import { useContext } from "react";
 import { Context } from "./utils/context";
 
 export const AddRecordCategory = () => {
-     const { setShowAddCategory } = useContext(Context);
+  const { setShowAddCategory } = useContext(Context);
 
   return (
     <div className="w-full h-[200px] bg-white absolute top-[80px] rounded-md shadow-lg">
@@ -18,7 +18,6 @@ export const AddRecordCategory = () => {
         <AddCategoryIcon />
         <p>Add Category</p>
       </label>
-
     </div>
   );
 };

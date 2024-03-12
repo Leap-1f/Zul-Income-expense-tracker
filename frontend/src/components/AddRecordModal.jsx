@@ -1,15 +1,26 @@
 import React, { useState } from "react";
+import { AddRecordCategory } from "./AddRecordCategory";
+import { useContext } from "react";
+import { Context } from "./utils/context";
 export const AddRecord = () => {
   const [selectedValue, setSelectedValue] = useState("expense");
+  const [categoryBox, setCategoryBox] = useState(false);
+  const { setShowAddCategory } = useContext(Context);
 
   const handleChange = (event) => {
     setSelectedValue(event.target.value);
   };
+  const handleSelectChange = (event) => {
+    // Assuming you want to show the box when any option is selected
+    setCategoryBox(!categoryBox);
+  };
   return (
     <div className="modal" role="dialog">
-      <div className="modal-box min-w-[700px] relative">
+      <div
+        className="modal-box min-w-[700px] relative "
+      >
         <div className="modal-action absolute right-4 top-0">
-          <label
+          <label onClick={()=>{setShowAddCategory(false);}}
             htmlFor="my_modal_6"
             className="btn btn-sm btn-circle btn-ghost "
           >
@@ -18,7 +29,7 @@ export const AddRecord = () => {
         </div>
         <h3 className="font-bold text-lg mb-3 ">Add Record</h3>
         <div className="flex gap-10 border-t py-3">
-          <div className="flex flex-col gap-5 w-1/2">
+          <div className="flex flex-col gap-5 w-1/2 relative">
             <div className="relative w-[full] h-10">
               <div className="bg-[#e4e4e4] w-full h-full rounded-[20px]"></div>
               <div className="absolute top-0 left-0 z-1 w-full h-full">
@@ -64,21 +75,23 @@ export const AddRecord = () => {
                 </div>
               </div>
             </div>
-            <div className="input input-bordered flex flex-col p-1 h-auto gap-2">
+            <div className="input input-bordered flex flex-col p-1 h-auto gap-2 bg-[#F9FAFB]">
               <label className="text-gray-700">Amount</label>
               <input className="" type="text" placeholder="₮ 0.00" />
             </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="" className="text-gray-700">
+            <div className="flex flex-col relative">
+              <label htmlFor="" className="text-gray-700 mb-2">
                 Category
               </label>
-              <select className="select select-bordered w-full max-w-xs">
-                <option disabled defaultValue className="text-gray-300">
-                  Find or choose category
-                </option>
-                <option>Han Solo</option>
-                <option>Greedo</option>
-              </select>
+              <button
+                onClick={handleSelectChange}
+                className="h-12 w-full rounded-md border border-gray-300 bg-gray-50"
+              >
+                Find or choose category
+              </button>
+              {categoryBox && (
+                <AddRecordCategory/>
+              )}
             </div>
             <div className="flex *:flex *:flex-col *:gap-2 justify-between *:w-[48%] ">
               <form>
@@ -89,7 +102,7 @@ export const AddRecord = () => {
                   type="date"
                   id="transactionDate"
                   name="date"
-                  className="input input-bordered"
+                  className="input input-bordered bg-gray-50"
                 />
               </form>
               <form>
@@ -100,7 +113,7 @@ export const AddRecord = () => {
                   type="time"
                   id="transactionTime"
                   name="time"
-                  className="input input-bordered"
+                  className="input input-bordered bg-gray-50"
                 />
               </form>
             </div>

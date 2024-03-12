@@ -1,5 +1,5 @@
 import { Vector } from "../utils/IconGeld";
-import { AddRecord } from "../Modal";
+import { AddRecord } from "../AddRecordModal";
 import Link from "next/link";
 
 export const Navbar = () => {

@@ -4,6 +4,8 @@ import { useState } from "react";
 export const Context = createContext([]);
 export const ContextProvider = ({children}) => {
      const [isLoading, setIsLoading] = useState(false);
+     const [showAddCategory, setShowAddCategory] = useState(false);
+     const [showAddCategoryIcons, setShowAddCategoryIcons] = useState(false);
      const [signUpUserInfo, setSignUpUserInfo] = useState({
           name: "",
           email: "",
@@ -18,6 +20,6 @@ export const ContextProvider = ({children}) => {
           }, 1000);
         };
      return (
-          <Context.Provider value={{isLoading, signUpUserInfo, setSignUpUserInfo, startLoading}}>{children}</Context.Provider>
+          <Context.Provider value={{isLoading, signUpUserInfo, showAddCategory, setShowAddCategory, showAddCategoryIcons, setShowAddCategoryIcons, setSignUpUserInfo, startLoading}}>{children}</Context.Provider>
      )
 }

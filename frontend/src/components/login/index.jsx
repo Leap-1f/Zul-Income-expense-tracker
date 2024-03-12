@@ -227,7 +227,7 @@ export const LogIn = () => {
                   <p className="text-red-500 text-xs">{warningMessage}</p>
                 )}
                 <button type="submit" className="btn btn-primary w-full">
-                  Sign in
+                  Sign up
                 </button>
               </form>
             </FormikProvider>

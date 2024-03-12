@@ -5,6 +5,10 @@ import { loginSchema, signUpSchema } from "./validationSchema";
 import { useFormik, FormikProvider } from "formik";
 import { Context } from "../utils/context";
 
+const endPointUrl = "http://localhost:9090";
+
+//https://zulaa-back.vercel.app/
+
 export const LogIn = () => {
   const { push } = useRouter();
   const [signUp, setSignUp] = useState(false);
@@ -22,7 +26,7 @@ export const LogIn = () => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        const res = await fetch("http://localhost:9090/api/signin", {
+        const res = await fetch(endPointUrl + "/api/signin", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -35,8 +39,7 @@ export const LogIn = () => {
 
         if (response.message) {
           setWarningMessage(response.message);
-        }
-        else if (response.success) {
+        } else if (response.success) {
           setSignUpUserInfo({
             ...signUpUserInfo,
             name: values.name,
@@ -91,9 +94,7 @@ export const LogIn = () => {
     setSignUp(false);
     setWarningMessage("");
   };
-  useEffect(() => {
-
-  }, [warningMessage])
+  useEffect(() => {}, [warningMessage]);
 
   return (
     <div className="flex *:w-1/2 *:h-[100vh]">

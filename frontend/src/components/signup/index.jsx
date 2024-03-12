@@ -16,7 +16,7 @@ export const SignUp = () => {
     return currentStep === 2 ? "Return to login" : "Confirm";
   };
   const { push } = useRouter();
-
+const url = "http://localhost:9090"
   const confirm = async () => {
     if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
@@ -24,7 +24,7 @@ export const SignUp = () => {
       console.log("-----------------");
       console.log(signUpUserInfo);
       try {
-        const res = await fetch("http://localhost:9090/api/signup", {
+        const res = await fetch("https://zulaa-back.vercel.app/api/signup", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",

@@ -26,7 +26,7 @@ export const LogIn = () => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        const res = await fetch("http://localhost:9090/api/signin", {
+        const res = await fetch("https://zulaa-back.vercel.app/api/signin", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -62,9 +62,10 @@ export const LogIn = () => {
     validationSchema: loginSchema,
     onSubmit: async (values) => {
       console.log(values, "this is values");
+      // const url = "http://localhost:9090";
 
       try {
-        const res = await fetch("http://localhost:9090/api/login", {
+        const res = await fetch("https://zulaa-back.vercel.app/api/login", {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",

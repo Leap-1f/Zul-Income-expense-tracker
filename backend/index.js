@@ -10,10 +10,23 @@ const port = 9090;
 app.use(cors());
 app.use(express.json());
 
+
+
+
+const logRequest = (req, res, next) => {
+  console.log("req.method", req.method);
+  if(req.body.name === "bat"){
+    res.send("batig orulahgu")
+  }
+  next()
+}
+// middleware, authorization
+
+
+app.use(logRequest);
 app.use("/api/", user);
 app.use("/api/category", category);
 app.use("/api/transaction", transaction);
-
 
 app.listen(port, () => {
   console.log(`ene port deer server  aslaa http://localhost:${port}`);

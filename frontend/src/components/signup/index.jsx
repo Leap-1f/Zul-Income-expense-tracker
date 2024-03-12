@@ -15,8 +15,9 @@ export const SignUp = () => {
   const confirmButton = () => {
     return currentStep === 2 ? "Return to login" : "Confirm";
   };
+  console.log(process.env.NEXT_PUBLIC_ENDPOINT);
   const { push } = useRouter();
-const url = "http://localhost:9090"
+  const url = "http://localhost:9090";
   const confirm = async () => {
     if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
@@ -24,14 +25,17 @@ const url = "http://localhost:9090"
       console.log("-----------------");
       console.log(signUpUserInfo);
       try {
-        const res = await fetch("https://zulaa-back.vercel.app/api/signup", {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify(signUpUserInfo),
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/signup`,
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify(signUpUserInfo),
+          }
+        );
         const data = await res.json();
         console.log(data);
       } catch (err) {
@@ -73,34 +77,30 @@ const url = "http://localhost:9090"
       </div>
       <div className="relative w-[400px] ">
         <div className="absolute -left-10 top-[130px] z-1 ">
-        <button
-          onClick={previous}
-          disabled={currentStep === 0}
-          className="flex justify-center items-center rounded-full hover:scale-150 active:scale-125 w-5 h-5"
-        >
-          <PreviousButton currentStep={currentStep}/>
-        </button>
+          <button
+            onClick={previous}
+            disabled={currentStep === 0}
+            className="flex justify-center items-center rounded-full hover:scale-150 active:scale-125 w-5 h-5"
+          >
+            <PreviousButton currentStep={currentStep} />
+          </button>
         </div>
-        
+
         <div className="flex flex-col items-center justify-center">
-        <div>
-          {currentStep === 0 && <StepOne />}
-          {currentStep === 1 && <StepTwo />}
-          {currentStep === 2 && <StepThree />}
+          <div>
+            {currentStep === 0 && <StepOne />}
+            {currentStep === 1 && <StepTwo />}
+            {currentStep === 2 && <StepThree />}
+          </div>
+          <button
+            onClick={confirm}
+            // disabled={currentStep === numberOfSteps - 1}
+            className="btn btn-primary w-full mt-[50px]"
+          >
+            {confirmButton()}
+          </button>
         </div>
-        <button
-        onClick={confirm}
-        // disabled={currentStep === numberOfSteps - 1}
-        className="btn btn-primary w-full mt-[50px]"
-      >
-        {confirmButton()}
-      </button>
-
-        </div>
-        
       </div>
-
-
     </div>
   );
 };

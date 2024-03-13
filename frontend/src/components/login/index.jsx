@@ -5,12 +5,11 @@ import { loginSchema, signUpSchema } from "./validationSchema.js";
 import { useFormik, FormikProvider } from "formik";
 import { Context } from "../utils/context";
 
-
 export const LogIn = () => {
   const { push } = useRouter();
   const [signUp, setSignUp] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-  const { signUpUserInfo, setSignUpUserInfo} = useContext(Context);
+  const { signUpUserInfo, setSignUpUserInfo } = useContext(Context);
 
   const formikSignUp = useFormik({
     initialValues: {
@@ -23,14 +22,17 @@ export const LogIn = () => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_ENDPOINT}/api/signin`, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify(values),
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/signin`,
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify(values),
+          }
+        );
         const response = await res.json();
         console.log(response);
 
@@ -58,16 +60,18 @@ export const LogIn = () => {
     },
     validationSchema: loginSchema,
     onSubmit: async (values) => {
-
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_ENDPOINT}/api/login`, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify(values),
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/login`,
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify(values),
+          }
+        );
         const response = await res.json();
         console.log(response);
         if (response.success) {

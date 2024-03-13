@@ -1,17 +1,22 @@
 import { Vector } from "../utils/IconGeld";
 import { AddRecord } from "../AddRecordModal";
 import Link from "next/link";
+import { useState } from "react";
+
+
 
 export const Navbar = () => {
+
   return (
     <div className="bg-white py-4">
       <div className="max-w-screen-xl navbar m-auto ">
         <div className="flex-1 items-center gap-6">
           <Vector />
-          <Link href="/dashboard" className="active:scale-95 transition">
+          {/* <Link href="/dashboard" onClick={toggleFontWeight}  style={{ fontWeight: fontWeightToggle ? 'bold' : 'normal' }} className="active:scale-95 transition visited:text-bold">
             Dashboard
           </Link>
-          <Link href="/record" className="active:scale-95 transition">Records</Link>
+          <Link href="/record" style={{ fontWeight: fontWeightToggle ? 'normal' : 'bold' }} className="active:scale-95 transition">Records</Link> */}
+
         </div>
         <div className="flex-none items-center gap-6">
           <label

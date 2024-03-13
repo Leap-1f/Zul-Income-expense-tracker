@@ -1,2 +1,2 @@
-Front-end url - https://expense-tracker-front-86cwnhs5e-zulsars-projects.vercel.app/
-Back-end url -https://zulaa-back.vercel.app/
+Front-end url - https://expense-tracker-front-blrjkp3qy-zulsars-projects.vercel.app
+Back-end url -https://zulaa-back-bqplstlfk-zulsars-projects.vercel.app 

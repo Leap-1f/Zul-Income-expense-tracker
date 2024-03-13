@@ -96,7 +96,6 @@ export const categoryIcons = [
   MdChildFriendly,
 ];
 
-console.log(categoryIcons, "category iconss");
 export const Home = () => {
   return (
     <svg

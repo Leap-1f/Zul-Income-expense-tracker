@@ -8,7 +8,7 @@ import { Context } from "../utils/context";
 import { PreviousButton } from "../utils";
 
 export const SignUp = () => {
-  const {startLoading, signUpUserInfo } = useContext(Context);
+  const {startLoading, signUpUserInfo, isLoading } = useContext(Context);
   const [currentStep, setCurrentStep] = useState(0);
 
   const numberOfSteps = 3;
@@ -17,7 +17,7 @@ export const SignUp = () => {
   };
   console.log(process.env.NEXT_PUBLIC_ENDPOINT);
   const { push } = useRouter();
-  const url = "http://localhost:9090";
+
   const confirm = async () => {
     if (currentStep < 2) {
       setCurrentStep(currentStep + 1);

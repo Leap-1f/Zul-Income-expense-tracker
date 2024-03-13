@@ -13,9 +13,9 @@ export const getAllCategories = async (req, res) => {
 };
 
 export const postCategory = async (req, res) => {
-  try{const data = await sql`SELECT * FROM ${sql(tableName)}`;
+  try{const data = await sql`SELECT * FROM category`;
   const newCategory =
-    await sql`INSERT INTO ${sql(tableName)}(email, name) VALUES(${req.body.name}, ${req.body.email}) RETURNING *`;
+    await sql`INSERT INTO category(name, description, category_image) VALUES(${req.body.categoryName}, ${req.body.categoryImg.color}, ${req.body.categoryImg.imgName}) RETURNING *`;
   data.push(newCategory);
   console.log(data);
   res.send(data);

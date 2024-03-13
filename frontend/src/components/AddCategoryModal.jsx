@@ -1,8 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "./utils/context";
 import { AddRecord } from "./AddRecordModal";
 import { ArrowDropDown, Home } from "./utils/CategoryIcons";
 import { categoryIcons } from "./utils/CategoryIcons";
+
+import { IoMdHome, IoIosGift } from "react-icons/io";
 
 export const AddCategoryModal = () => {
   const { setShowAddCategory } = useContext(Context);
@@ -11,7 +13,9 @@ export const AddCategoryModal = () => {
   const [categoryIconsBox, setCategoryIconsBox] = useState(false);
   const [newCategoryInfo, setNewCategoryInfo] = useState({
     categoryName: "",
-    categoryImg: "",
+    categoryImg: {imageName : IoMdHome, color: "gray"},
+    color: "",
+    index: 0,
   });
 
   const handleSelectChangeToggle = () => {
@@ -21,13 +25,25 @@ export const AddCategoryModal = () => {
     setCategoryIconsBox(false);
   };
 
+
+  useEffect(() => {
+    
+    console.log(selectedColor, "updated selected color");
+    setNewCategoryInfo({
+      ...newCategoryInfo,
+      color: selectedColor,
+    });
+  }, [selectedColor]);
   const handleColorChange = (color) => {
-    setSelectedColor(color);
+    setSelectedColor(color)
+
+    console.log(selectedColor, "selected color");
     const IconComponent = categoryIcons[selectedIconIndex];
+    console.log(IconComponent, "iconName");
     if (IconComponent) {
       setNewCategoryInfo({
         ...newCategoryInfo,
-        categoryImg: <IconComponent color={color} className="w-5 h-5" />,
+        categoryImg: { imgName: `${IconComponent}`, color: color },
       });
     }
   };
@@ -38,9 +54,7 @@ export const AddCategoryModal = () => {
     if (IconComponent) {
       setNewCategoryInfo({
         ...newCategoryInfo,
-        categoryImg: (
-          <IconComponent color={selectedColor} className="w-5 h-5" />
-        ),
+        categoryImg: <IconComponent color={selectedColor} />,
       });
     }
   };
@@ -59,6 +73,31 @@ export const AddCategoryModal = () => {
     return null;
   };
   console.log(newCategoryInfo, "newcatinfokkk");
+  const addCategoryButton = async () => {
+    console.log("ehellee");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category`,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify(newCategoryInfo),
+        }
+      );
+      const data = await res.json();
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+    // setCategoryIconsBox(false);
+    setSelectedColor("gray");
+    setSelectedIconIndex(0)
+
+    console.log("duusla");
+  };
   return (
     <div className="absolute top-0 left-0 w-full h-[100vh] z-1">
       <div className="relative w-full h-[100vh] flex items-center justify-center">
@@ -79,7 +118,7 @@ export const AddCategoryModal = () => {
                 ✕
               </label>
               <input type="checkbox" id="my_modal_6" className="modal-toggle" />
-              <AddRecord></AddRecord>
+              {/* <AddRecord></AddRecord> */}
             </div>
           </div>
           <div className="relative">
@@ -97,15 +136,16 @@ export const AddCategoryModal = () => {
                 onClick={handleSelectChange}
                 className="input input-bordered w-[78%]"
                 onChange={handleInputChange}
+                // value={''}
               />
             </div>
             {categoryIconsBox && (
-              <div className="w-[300px] h-[300px] bg-red-200 absolute top-[50px] rounded-md shadow-xl p-3">
+              <div className="w-[300px] h-[300px] bg-white absolute top-[50px] rounded-md shadow-xl p-3">
                 <div className="flex flex-col h-full justify-between">
                   <div className="grid grid-cols-6 h-full">
                     {categoryIcons.map((IconComponent, index) => (
                       <div
-                        className="flex justify-center items-center p-1"
+                        className="flex justify-center items-center p-1 "
                         key={index}
                         onClick={() => handleIconChange(index)}
                       >
@@ -123,13 +163,11 @@ export const AddCategoryModal = () => {
                       "red",
                       "black",
                     ].map((color, index) => {
-                      let code = "-500";
-                      color == "black" ? (code = "") : "-500";
                       return (
                         <div
                           key={index}
-                          className={`bg-${color}${code}`}
                           onClick={() => handleColorChange(color)}
+                          style={{ backgroundColor: color }}
                         ></div>
                       );
                     })}
@@ -138,12 +176,20 @@ export const AddCategoryModal = () => {
               </div>
             )}
           </div>
-          <button
-            disabled={categoryIconsBox}
-            className="btn w-full text-white rounded-full bg-green-600"
-          >
-            Add Category
-          </button>
+
+          {/* <button disabled={categoryIconsBox}
+            onClick={addCategoryButton} className=" modal-action btn w-full text-white rounded-full bg-green-600"> */}
+          <div disabled={categoryIconsBox} onClick={addCategoryButton} className="modal-action m-0">
+              <label
+                htmlFor="my_modal_6"
+                className=""
+              >
+                  Add Category
+              </label>
+              <input type="checkbox" id="my_modal_6" className="modal-toggle" />
+              {/* <AddRecord></AddRecord> */}
+            </div>
+            {/* </button> */}
         </div>
       </div>
     </div>

@@ -9,41 +9,25 @@ import { AddCategoryPopUp } from "./AddCategoryPopUp";
 export const AddRecordCategory = ({
   setShowAddRecordModal,
   setShowAddCategory,
+  categoryData,
+  setSelectedCategoryId,
+  setSelectedCategory,
+  setCategoryBox,
 }) => {
+  // console.log(selectedCategoryId);
   // const { setShowAddCategory } = useContext(Context);
   // const [showAddCategory, setShowAddCategory] = useState(false);
-  const [categoryData, setCategoryData] = useState([]);
-
-  const fetchData = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category`,
-      {
-        method: "GET",
-        cache: "no-cache",
-        credentials: "same-origin", // include, *same-origin, omit
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json",
-        },
-      }
-    ).then((res) => res.json());
-
-    setCategoryData(res);
-  };
-
-  const addData = (addedData) => {
-    setCategoryData(...prev, addedData);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const handleAddCategory = () => {
     setShowAddCategory(true);
     setShowAddRecordModal(false);
   };
-
+  const handleSelectCategory = (element) => {
+    console.log(element.id);
+    setSelectedCategoryId({ id: element.id });
+    setSelectedCategory(true);
+    setCategoryBox(false);
+  };
   return (
     <div className="w-full h-[300px] bg-white absolute top-[80px] rounded-md shadow-lg overflow-auto">
       <label
@@ -60,8 +44,8 @@ export const AddRecordCategory = ({
 
           return (
             <div
+              onClick={() => handleSelectCategory(element)}
               key={element.id}
-              htmlFor="my_modal_6"
               className="flex w-full p-3 gap-3 rounded-t-md hover:bg-gray-50 active:scale-95"
             >
               {IconComponent && (

@@ -18,3 +18,8 @@ export const signUpSchema = Yup.object().shape({
     "Passwords must match"
   ),
 });
+export const amount = Yup.object().shape({
+  amount: Yup.number()
+  .typeError("Amount must be a number")
+    .required("Amount is required *"),
+});

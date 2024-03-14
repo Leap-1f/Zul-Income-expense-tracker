@@ -11,6 +11,15 @@ export const getAllCategories = async (req, res) => {
     console.log(err);
   }
 };
+export const getSelectCategory = async (req, res) => {
+  try {
+    const data = await sql`SELECT * FROM category WHERE id=${req.body.id}`;
+    console.log(data);
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 export const postCategory = async (req, res) => {
   try{const data = await sql`SELECT * FROM category`;

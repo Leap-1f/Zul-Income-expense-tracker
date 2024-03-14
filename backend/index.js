@@ -25,7 +25,7 @@ const logRequest = (req, res, next) => {
 
 app.use(logRequest);
 app.use("/api/", user);
-app.use("/api/category", category);
+app.use("/api", category);
 app.use("/api/transaction", transaction);
 
 app.listen(port, () => {

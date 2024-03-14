@@ -2,17 +2,70 @@ import React, { useState } from "react";
 import { AddRecordCategory } from "./AddRecordCategory";
 import { useContext } from "react";
 import { Context } from "./utils/context";
+import { iconComponentMap } from "./utils/CategoryIcons";
+import { useEffect } from "react";
+
 export const AddRecordPopUp = ({
   setShowAddRecordModal,
   setShowAddCategory,
 }) => {
   const [selectedValue, setSelectedValue] = useState("expense");
   const [categoryBox, setCategoryBox] = useState(false);
-  //   const { setShowAddCategory } = useContext(Context);
+  const [selectedCategory, setSelectedCategory] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState({ id: "" });
+  const [selectedCategoryData, setSelectedCategoryData] = useState({});
+
+  const [categoryData, setCategoryData] = useState([]);
+
+  const fetchData = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ENDPOINT}/api`, {
+      method: "GET",
+      cache: "no-cache",
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
+
+    setCategoryData(res);
+  };
+  const fetchSelectedCategoryData = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category`,
+      {
+        method: "POST",
+        cache: "no-cache",
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(selectedCategoryId),
+      }
+    ).then((res) => res.json());
+    console.log(res);
+    setSelectedCategoryData(res);
+  };
+  console.log(selectedCategoryData, "selectedCategoryData");
+  // console.log(selectedCategoryData[0].name, "selectedCategoryData.name");
+  // const addData = (addedData) => {
+  //   setCategoryData(...prev, addedData);
+  // };
+
+  useEffect(() => {
+    fetchData();
+    fetchSelectedCategoryData();
+  }, []);
 
   const handleChange = (event) => {
     setSelectedValue(event.target.value);
   };
+  let IconComponent = "";
+  if (selectedCategoryData.length > 0) {
+    IconComponent = iconComponentMap[selectedCategoryData[0].category_image];
+    return;
+  }
   const handleSelectChange = (event) => {
     // Assuming you want to show the box when any option is selected
     setCategoryBox(!categoryBox);
@@ -23,7 +76,7 @@ export const AddRecordPopUp = ({
         <div className="absolute right-4 top-0">
           <button
             onClick={() => {
-              setShowAddCategory(false);
+              setShowAddRecordModal(false);
             }}
             className="btn btn-sm btn-circle btn-ghost "
           >
@@ -88,14 +141,38 @@ export const AddRecordPopUp = ({
               </label>
               <button
                 onClick={handleSelectChange}
-                className="h-12 w-full rounded-md border border-gray-300 bg-gray-50"
+                className="h-12 w-full rounded-md border border-gray-300 bg-gray-50 text-start px-3 hover:bg-gray-100"
               >
-                Find or choose category
+                {" "}
+                {!selectedCategory && "Find or choose categssssory"}
+                {selectedCategory && (
+                  <div
+                    key={selectedCategoryData[0] && selectedCategoryData[0].id}
+                    className="flex w-full p-3 gap-3 rounded-t-md hover:bg-gray-50 active:scale-95"
+                  >
+                    {IconComponent && (
+                      <IconComponent
+                        color={
+                          selectedCategoryData[0] &&
+                          selectedCategoryData[0].description
+                        }
+                        className="w-5 h-5"
+                      />
+                    )}
+                    <p>
+                      {selectedCategoryData[0] && selectedCategoryData[0].name}
+                    </p>
+                  </div>
+                )}
               </button>
               {categoryBox && (
                 <AddRecordCategory
                   setShowAddRecordModal={setShowAddRecordModal}
                   setShowAddCategory={setShowAddCategory}
+                  categoryData={categoryData}
+                  setSelectedCategoryId={setSelectedCategoryId}
+                  setSelectedCategory={setSelectedCategory}
+                  setCategoryBox={setCategoryBox}
                 />
               )}
             </div>
@@ -108,7 +185,7 @@ export const AddRecordPopUp = ({
                   type="date"
                   id="transactionDate"
                   name="date"
-                  className="input input-bordered bg-gray-50"
+                  className="input input-bordered bg-gray-50 cursor-pointer"
                 />
               </form>
               <form>
@@ -119,7 +196,7 @@ export const AddRecordPopUp = ({
                   type="time"
                   id="transactionTime"
                   name="time"
-                  className="input input-bordered bg-gray-50"
+                  className="input input-bordered bg-gray-50 cursor-pointer"
                 />
               </form>
             </div>

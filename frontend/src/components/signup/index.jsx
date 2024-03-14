@@ -6,9 +6,12 @@ import React from "react";
 import { StepOne, StepTwo, StepThree, Stepper } from "../stepper/index";
 import { Context } from "../utils/context";
 import { PreviousButton } from "../utils";
+import { useFormik } from "formik";
+import { amount } from "../login/validationSchema";
 
 export const SignUp = () => {
-  const {startLoading, signUpUserInfo, isLoading } = useContext(Context);
+  const { startLoading, signUpUserInfo, isLoading, setSignUpUserInfo } =
+    useContext(Context);
   const [currentStep, setCurrentStep] = useState(0);
 
   const numberOfSteps = 3;
@@ -16,11 +19,32 @@ export const SignUp = () => {
     return currentStep === 2 ? "Return to login" : "Confirm";
   };
   console.log(process.env.NEXT_PUBLIC_ENDPOINT);
-  const { push } = useRouter();
 
-  const confirm = async () => {
-    if (currentStep < 2) {
+  const { push } = useRouter();
+  const formikAmount = useFormik({
+    initialValues: {
+      amount: "",
+    },
+    validationSchema: amount,
+    onReset: (e) => {
+      const formatter = new Intl.NumberFormat("en-US");
+      console.log(e.target.value);
+      formatter.format(e.target.value);
+    },
+    onSubmit: async (value) => {
+      setSignUpUserInfo({
+        ...signUpUserInfo,
+        amount: value.amount,
+      });
+      console.log("step2 submit ajillaa");
       setCurrentStep(currentStep + 1);
+    },
+  });
+  const confirm = async () => {
+    if (currentStep === 0) {
+      setCurrentStep(currentStep + 1);
+    } else if (currentStep === 1) {
+      formikAmount.handleSubmit();
     } else if (currentStep === 2) {
       console.log("-----------------");
       console.log(signUpUserInfo);
@@ -89,10 +113,11 @@ export const SignUp = () => {
         <div className="flex flex-col items-center justify-center">
           <div>
             {currentStep === 0 && <StepOne />}
-            {currentStep === 1 && <StepTwo />}
+            {currentStep === 1 && <StepTwo formikAmount={formikAmount} />}
             {currentStep === 2 && <StepThree />}
           </div>
           <button
+            type="submit"
             onClick={confirm}
             // disabled={currentStep === numberOfSteps - 1}
             className="btn btn-primary w-full mt-[50px]"

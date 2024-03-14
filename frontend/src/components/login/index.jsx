@@ -127,7 +127,7 @@ export const LogIn = () => {
                 ) : null}
                 <input
                   onChange={formikLogIn.handleChange}
-                  type="text"
+                  type="password"
                   placeholder="Password"
                   className="input input-bordered w-full max-w-xs"
                   name="password"
@@ -200,7 +200,7 @@ export const LogIn = () => {
                 ) : null}
                 <input
                   onChange={formikSignUp.handleChange}
-                  type="text"
+                  type="password"
                   placeholder="Password"
                   className="input input-bordered w-full max-w-xs"
                   name="password"
@@ -213,7 +213,7 @@ export const LogIn = () => {
                 ) : null}
                 <input
                   onChange={formikSignUp.handleChange}
-                  type="text"
+                  type="password"
                   placeholder="Re-password"
                   className="input input-bordered w-full max-w-xs"
                   name="rePassword"

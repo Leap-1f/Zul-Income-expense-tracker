@@ -4,16 +4,19 @@ import { AddRecord } from "./AddRecordModal";
 import { ArrowDropDown, Home } from "./utils/CategoryIcons";
 import { categoryIcons } from "./utils/CategoryIcons";
 
-import { IoMdHome, IoIosGift } from "react-icons/io";
-
-export const AddCategoryModal = ({ setShowAddCategory, addData }) => {
+import { MdHome } from "react-icons/md";
+// setShowAddCategory, addData,
+export const AddCategoryPopUp = ({
+  setShowAddRecordModal,
+  setShowAddCategory,
+}) => {
   // const { setShowAddCategory } = useContext(Context);
   const [selectedIconIndex, setSelectedIconIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState("gray");
   const [categoryIconsBox, setCategoryIconsBox] = useState(false);
   const [newCategoryInfo, setNewCategoryInfo] = useState({
     categoryName: "",
-    categoryImg: IoMdHome.name,
+    categoryImg: MdHome.name,
     color: "gray",
   });
 
@@ -108,7 +111,13 @@ export const AddCategoryModal = ({ setShowAddCategory, addData }) => {
         <div className="w-[500px] h-[240px] p-5 rounded-xl bg-white absolute top-center left-center z-3 flex flex-col justify-between">
           <div className="flex justify-between items-start border-b pb-3">
             <h3 className="font-bold text-lg ">Add category</h3>
-            <div className="modal-action m-0">
+            <div
+              onClick={() => {
+                setShowAddRecordModal(true);
+                setShowAddCategory(false);
+              }}
+              className="modal-action m-0"
+            >
               <label
                 htmlFor="my_modal_6"
                 className="btn btn-sm btn-circle btn-ghost"
@@ -180,7 +189,7 @@ export const AddCategoryModal = ({ setShowAddCategory, addData }) => {
           <div
             disabled={categoryIconsBox}
             onClick={addCategoryButton}
-            className="modal-action m-0"
+            className="modal-action m-0 *:w-full btn bg-green-500 rounded-full"
           >
             <label htmlFor="my_modal_6" className="">
               Add Category

@@ -7,7 +7,7 @@ import { StepOne, StepTwo, StepThree, Stepper } from "../stepper/index";
 import { Context } from "../utils/context";
 import { PreviousButton } from "../utils";
 import { useFormik } from "formik";
-import { amount } from "../login/validationSchema";
+import { amountSchema } from "../login/validationSchema";
 
 export const SignUp = () => {
   const { startLoading, signUpUserInfo, isLoading, setSignUpUserInfo } =
@@ -25,7 +25,7 @@ export const SignUp = () => {
     initialValues: {
       amount: "",
     },
-    validationSchema: amount,
+    validationSchema: amountSchema,
     onReset: (e) => {
       const formatter = new Intl.NumberFormat("en-US");
       console.log(e.target.value);

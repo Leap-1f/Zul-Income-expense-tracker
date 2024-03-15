@@ -12,13 +12,13 @@ export const getAllTransaction = async (req, res) => {
 };
 
 export const postTransaction = async (req, res) => {
+  const { payee, amount,switchOne, note, date, time, categoryId, dateAndTime } = req.body;
   try {
-    const data = await sql`SELECT * FROM ${sql(tableName)}`;
-    const newUser =
-      await sql`INSERT INTO ${sql(tableName)}(email, name) VALUES(${req.body.email}, ${req.body.name}) RETURNING *`;
-    data.push(newUser);
-    console.log(data);
-    res.send(data);
+    const data = await sql`SELECT * FROM transaction`;
+    const newTransaction =
+      await sql`INSERT INTO transaction(name, amount, transaction_type, description, createdat, category_id) VALUES(${payee}, ${amount}, ${switchOne}, ${note}, ${dateAndTime}, ${categoryId}) RETURNING *`;
+    data.push(newTransaction);
+    res.send(newTransaction);
   } catch (err) {
     console.log(err);
   }

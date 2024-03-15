@@ -8,7 +8,7 @@ export const AddRecordCategory = ({
   setSelectedCategory,
   setCategoryBox,
   newCategoryInfo,
-  isLoading,
+  isLoadingFetchAllCategoryData,
 }) => {
   const handleAddCategory = () => {
     setShowAddCategory(true);
@@ -25,7 +25,7 @@ export const AddRecordCategory = ({
     setCategoryBox(false);
   };
   let empty = "";
-  if (isLoading) {
+  if (isLoadingFetchAllCategoryData) {
     empty = "";
   } else if (categoryData.length === 0) {
     empty = "Empty";
@@ -41,12 +41,12 @@ export const AddRecordCategory = ({
       </label>
       <div className="overflow-auto p-3 text-gray-200">
         {empty}
-        {isLoading && (
+        {isLoadingFetchAllCategoryData && (
           <div className="w-full h-[200px] flex justify-center items-center ">
             <span className="loading loading-spinner loading-md"></span>
           </div>
         )}
-        {!isLoading && (
+        {!isLoadingFetchAllCategoryData && (
           <div>
             {categoryData.map((element) => {
               if (categoryData.length === 0) {

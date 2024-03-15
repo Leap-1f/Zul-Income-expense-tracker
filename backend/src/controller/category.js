@@ -13,7 +13,16 @@ export const getAllCategories = async (req, res) => {
 };
 export const getSelectCategory = async (req, res) => {
   try {
-    const data = await sql`SELECT * FROM category WHERE id=${req.body.id}`;
+    const data = await sql`SELECT * FROM category WHERE name=${req.body.categoryName} and description=${req.body.color} and category_image=${req.body.categoryImg}`;
+    console.log(data);
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const getSelectCategoryId = async (req, res) => {
+  try {
+    const data = await sql`SELECT id FROM category WHERE name=${req.body.name} and description=${req.body.color} and category_image=${req.body.image}`;
     console.log(data);
     res.send(data);
   } catch (err) {

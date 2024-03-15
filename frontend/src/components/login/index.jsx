@@ -109,7 +109,6 @@ export const LogIn = () => {
             <FormikProvider value={formikLogIn}>
               <form
                 className="flex flex-col gap-2 w-full"
-                action=""
                 onSubmit={formikLogIn.handleSubmit}
               >
                 <input

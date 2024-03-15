@@ -4,33 +4,21 @@ import { AddRecordPopUp } from "@/components/AddRecordPopUp";
 import { AddCategoryPopUp } from "@/components/AddCategoryPopUp";
 import { useState } from "react";
 export default function Home() {
-  // const { showAddCategory } = useContext(Context);
-  const [showAddRecordModal, setShowAddRecordModal] = useState(false);
-  const [showAddCategory, setShowAddCategory] = useState(false);
-  console.log(showAddRecordModal);
+  const [showAddRecordPopUp, setShowAddRecordPopUp] = useState(false);
+
   return (
     <div className="relative w-full h-full">
       <div>
-        <Navbar setShowAddRecordModal={setShowAddRecordModal} />
+        <Navbar setShowAddRecordPopUp={setShowAddRecordPopUp} />
         <CashCard />
       </div>
-      {showAddRecordModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-1">
-          <div className="bg-white p-4 rounded-2xl shadow-lg">
-            <div>hello</div>
-            <AddRecordPopUp
-              setShowAddRecordModal={setShowAddRecordModal}
-              setShowAddCategory={setShowAddCategory}
-            />
-          </div>
-        </div>
-      )}
-      {showAddCategory && (
-        <AddCategoryPopUp
-          setShowAddRecordModal={setShowAddRecordModal}
-          setShowAddCategory={setShowAddCategory}
+      {showAddRecordPopUp && (
+        <AddRecordPopUp
+          setShowAddRecordPopUp={setShowAddRecordPopUp}
         />
+
       )}
+
     </div>
   );
 }

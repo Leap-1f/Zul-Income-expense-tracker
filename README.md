@@ -10,4 +10,4 @@ todo:
 4. responsive
 5. addRecord transaction backend
 6. Amount $ || ₮
-7. 
+7. Navbar dashboard record active:text-bold

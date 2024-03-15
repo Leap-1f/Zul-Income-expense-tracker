@@ -1,10 +1,7 @@
-import { Vector } from "../utils/IconGeld";
-import { AddRecord } from "../AddRecordModal";
+import { Vector } from "../utils/IconGeld"
 import Link from "next/link";
-import { useState } from "react";
-import { AddRecordPopUp } from "../AddRecordPopUp";
 
-export const Navbar = ({ setShowAddRecordModal }) => {
+export const Navbar = ({ setShowAddRecordPopUp }) => {
   return (
     <div className="bg-white pt-4">
       <div className="max-w-screen-xl navbar m-auto ">
@@ -21,16 +18,8 @@ export const Navbar = ({ setShowAddRecordModal }) => {
           </Link>
         </div>
         <div className="flex-none items-center gap-6">
-          {/* <label
-            htmlFor="my_modal_6"
-            className="btn btn-primary btn-sm rounded-full"
-          >
-            + Record
-          </label>
-          <input type="checkbox" id="my_modal_6" className="modal-toggle" />
-          <AddRecord></AddRecord> */}
           <button
-            onClick={() => setShowAddRecordModal(true)}
+            onClick={() => setShowAddRecordPopUp(true)}
             className="btn btn-primary btn-sm rounded-ful"
           >
             {" "}

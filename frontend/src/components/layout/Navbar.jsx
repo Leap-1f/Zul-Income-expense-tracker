@@ -1,10 +1,10 @@
-import { Vector } from "../utils/IconGeld"
+import { Vector } from "../utils/IconGeld";
 import Link from "next/link";
 
 export const Navbar = ({ setShowAddRecordPopUp }) => {
   return (
-    <div className="bg-white pt-4">
-      <div className="max-w-screen-xl navbar m-auto ">
+    <div className="bg-white 2xl:pt-4 h-[8vh]">
+      <div className="max-w-screen-lg navbar m-auto ">
         <div className="flex-1 items-center gap-6">
           <Vector />
           <Link

@@ -21,7 +21,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
   });
   const [categoryData, setCategoryData] = useState([]);
   const [newCategoryInfo, setNewCategoryInfo] = useState({
-    categoryName: "",
+    categoryName: "", 
     categoryImg: MdHome.name,
     color: "gray",
   });

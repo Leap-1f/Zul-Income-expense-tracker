@@ -13,7 +13,7 @@ export default function Home() {
     <div>
       <div className="">
         <Navbar setShowAddRecordPopUp={setShowAddRecordPopUp} />
-        <Record/>
+        <Record setShowAddRecordPopUp={setShowAddRecordPopUp}/>
       </div>
       {showAddRecordPopUp && (
         <AddRecordPopUp setShowAddRecordPopUp={setShowAddRecordPopUp} />

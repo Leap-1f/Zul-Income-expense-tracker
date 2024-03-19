@@ -4,7 +4,7 @@ export const getAllTransaction = async (req, res) => {
   console.log("__________");
 
   try {
-    const data = await sql`SELECT * FROM ${sql(tableName)}`;
+    const data = await sql`SELECT * FROM transaction`;
     res.send(data);
   } catch (err) {
     console.log(err);

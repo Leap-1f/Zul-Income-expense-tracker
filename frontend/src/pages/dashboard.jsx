@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="relative w-full h-[100vh] bg-gray-100 ">
       <Navbar setShowAddRecordPopUp={setShowAddRecordPopUp} />
-      <div className="max-w-screen-xl container m-auto py-8">
+      <div className="max-w-screen-lg container m-auto h-[92vh]">
         <Dashboard />
       </div>
       {showAddRecordPopUp && (

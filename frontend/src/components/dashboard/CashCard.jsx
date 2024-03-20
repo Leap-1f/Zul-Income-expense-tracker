@@ -4,8 +4,8 @@ import { WhiteGeld } from "../utils/IconGeld";
 export const CashCard = () => {
   return (
     <div className="w-[33%] h-full">
-      <div className="relative bg-blue-500 rounded-xl w-full h-full p-8">
-        <div className=" flex flex-col h-full justify-center gap-3">
+      <div className="relative bg-blue-500 rounded-xl w-full h-full p-6">
+        <div className=" flex flex-col h-full justify-center gap-10">
           <WhiteGeld width="80" height="30" />
           <div>
             <p className="text-gray-300">Cash</p>

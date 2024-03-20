@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export const Navbar = ({ setShowAddRecordPopUp }) => {
   return (
-    <div className="bg-white 2xl:pt-4 h-[8vh]">
-      <div className="max-w-screen-lg navbar m-auto ">
+    <div className="bg-white h-[8vh]">
+      <div className="max-w-screen-lg navbar h-full m-auto ">
         <div className="flex-1 items-center gap-6">
           <Vector />
           <Link

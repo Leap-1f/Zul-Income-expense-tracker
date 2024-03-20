@@ -4,7 +4,13 @@ export const getAllTransaction = async (req, res) => {
   console.log("__________");
 
   try {
-    const data = await sql`SELECT * FROM transaction`;
+    const data = await sql`SELECT 
+    tar.*, 
+    cat.description as category_color, 
+    cat.name category_name, 
+    cat.category_image 
+  FROM transaction tar 
+    inner join category cat on tar.category_id = cat.id;`;
     res.send(data);
   } catch (err) {
     console.log(err);

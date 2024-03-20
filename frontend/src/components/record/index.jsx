@@ -12,37 +12,6 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     isLoadingFetchAllTransactionData,
     setIsLoadingFetchAllTransactionData,
   ] = useState(false);
-  // // Create a relative time formatter for English
-  // const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-
-  // // Function to get relative time
-  // const getRelativeTime = (date) => {
-  //  const now = new Date();
-  //  const elapsed = now - date; // Calculate the difference in milliseconds
-
-  //  // Determine the unit of time to use based on the elapsed time
-  //  const units = {
-  //     year: 24 * 60 * 60 * 1000 * 365,
-  //     month: 24 * 60 * 60 * 1000 * 365 / 12,
-  //     day: 24 * 60 * 60 * 1000,
-  //     hour: 60 * 60 * 1000,
-  //     minute: 60 * 1000,
-  //     second: 1000
-  //  };
-
-  //  for (const unit in units) {
-  //   console.log(unit);
-  //   console.log(Math.abs(elapsed));
-  //   console.log(units[unit]);
-  //     if (Math.abs(elapsed) >= units[unit] || unit === "second") {
-  //       return rtf.format(Math.round(elapsed / units[unit]), unit);
-  //     }
-  //  }
-  // };
-
-  // // Example usage
-  // const date = new Date('2024-02-17T00:00:00'); // Example date
-  // console.log(getRelativeTime(date)); // Outputs relative time, e.g., "2 days ago"
 
   const fetchAllCategoryData = async () => {
     try {
@@ -88,8 +57,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
       console.log(err);
     }
   };
-  const now = new Date();
-  console.log(now);
+
   const arr = [
     { name: "1honog", date: "2024-03-19 09:23:00" },
     { name: "1henhonog", date: "2024-03-19 09:00:00" },
@@ -117,7 +85,47 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     const now = new Date();
     return date.setHours(0, 0, 0, 0) === now.setHours(0, 0, 0, 0);
   };
+  // Function to check if a date is within the last week (excluding today and yesterday)
+  const isWithinLastWeek = (date) => {
+    const now = new Date();
+    const lastWeekStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - 7
+    );
+    return date >= lastWeekStart && !isToday(date) && !isYesterday(date);
+  };
 
+  // Function to check if a date is within the last month (excluding the latest week's data)
+  const isWithinLastMonth = (date) => {
+    const now = new Date();
+    const lastMonthStart = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+    return (
+      date >= lastMonthStart &&
+      !isWithinLastWeek(date) &&
+      !isToday(date) &&
+      !isYesterday(date)
+    );
+  };
+  const isWithinLast3Months = (date) => {
+    const now = new Date();
+    const lastMonthStart = new Date(
+      now.getFullYear(),
+      now.getMonth() - 3,
+      now.getDate()
+    );
+    return (
+      date >= lastMonthStart &&
+      !isWithinLastMonth(date) &&
+      !isWithinLastWeek(date) &&
+      !isToday(date) &&
+      !isYesterday(date)
+    );
+  };
   // Separate the data into "yesterday" and "today"
   const yesterdayTransactionData = allTransactionData
     ?.filter((item) => isYesterday(parseDate(item.createdat)))
@@ -125,14 +133,37 @@ export const Record = ({ setShowAddRecordPopUp }) => {
   const todayTransactionData = allTransactionData
     ?.filter((item) => isToday(parseDate(item.createdat)))
     .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
-
+  const lastWeekTransactionData = allTransactionData
+    ?.filter((item) => isWithinLastWeek(parseDate(item.createdat)))
+    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
+  const lastMonthTransactionData = allTransactionData
+    ?.filter((item) => isWithinLastMonth(parseDate(item.createdat)))
+    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
+  const last3MonthsTransactionData = allTransactionData
+    ?.filter((item) => isWithinLast3Months(parseDate(item.createdat)))
+    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
   console.log("Yesterday's data:", yesterdayTransactionData);
   console.log("Today's data:", todayTransactionData);
   // console.log(allCategoryData);
+
+  // // Sort the array in descending order
+  // allTransactionData?.sort(
+  //   (a, b) => new Date(b.createdat) - new Date(a.createdat)
+  // );
+
+  // // Get the latest 5 dates
+  // const latestTenDates = allTransactionData?.slice(0, 10);
   useEffect(() => {
     fetchAllCategoryData();
     fetchAllTransactionData();
   }, []);
+  const extractHourMinute = (dateString) => {
+    const dateObj = new Date(dateString);
+    const hour = dateObj.getHours();
+    const minute = dateObj.getMinutes();
+    return `${hour}:${minute}`;
+  };
+
   return (
     <div className=" bg-gray-100">
       <div className="h-[92vh] py-5 flex gap-5 max-w-screen-lg m-auto">
@@ -141,34 +172,43 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             <h1 className="text-2xl font-semibold">Records</h1>
             <button
               onClick={() => setShowAddRecordPopUp(true)}
-              className="w-full rounded-full bg-blue-600 h-8 hover:bg-blue-700 active:scale-95"
+              className="w-full rounded-full bg-blue-600 h-8 text-white hover:bg-blue-700 active:scale-95"
             >
               {" "}
               + Add{" "}
             </button>
             <input
               type="text"
-              placeholder="Type here"
+              placeholder="Search"
               className="input input-bordered w-full max-w-xs h-8"
             />
           </div>
           <div>
             <p className="font-medium">Types</p> {" "}
-            <input type="radio" id="html" name="fav_language" value="HTML" /> {" "}
-            <label for="html">All</label>
+            <input
+              type="radio"
+              class="form-radio accent-blue-700"
+              id="html"
+              name="fav_language"
+              value="HTML"
+            />
+              <label for="html">All</label>
             <br /> {" "}
             <input
               type="radio"
               id="css"
               name="fav_language"
               value="CSS"
-            />  <label for="css">Income</label>
+              class="form-radio accent-blue-700"
+            />
+              <label for="css">Income</label>
             <br /> {" "}
             <input
               type="radio"
               id="javascript"
               name="fav_language"
               value="JavaScript"
+              class="form-radio accent-blue-700"
             />
               <label for="javascript">Expense</label>
           </div>
@@ -192,17 +232,32 @@ export const Record = ({ setShowAddRecordPopUp }) => {
 
                         return (
                           <div
-                            onClick={() => handleSelectCategory(element)}
+                            // onClick={() => handleSelectCategory(element)}
                             key={element.id}
-                            className="flex w-full pb-2 gap-3 rounded-t-md hover:bg-gray-50 active:scale-95"
+                            className="flex w-full pl-1 py-2 justify-between cursor-pointer items-center rounded-md hover:bg-gray-50 active:scale-95"
                           >
-                            {IconComponent && (
-                              <IconComponent
-                                color={element.description}
-                                className="w-5 h-5"
+                            <div className="flex gap-3">
+                              {" "}
+                              {IconComponent && (
+                                <IconComponent
+                                  color={element.description}
+                                  className="w-5 h-5"
+                                />
+                              )}
+                              <p className="text-black">{element.name}</p>
+                            </div>
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M11.9167 10.5833L9.75004 12.7499C9.48615 13.0138 9.18407 13.0729 8.84379 12.927C8.50351 12.7812 8.33337 12.5208 8.33337 12.1458V7.85411C8.33337 7.47911 8.50351 7.21869 8.84379 7.07286C9.18407 6.92702 9.48615 6.98605 9.75004 7.24994L11.9167 9.41661C12 9.49994 12.0625 9.59022 12.1042 9.68744C12.1459 9.78466 12.1667 9.88883 12.1667 9.99994C12.1667 10.1111 12.1459 10.2152 12.1042 10.3124C12.0625 10.4097 12 10.4999 11.9167 10.5833Z"
+                                fill="#1C1B1F"
                               />
-                            )}
-                            <p className="text-black">{element.name}</p>
+                            </svg>
                           </div>
                         );
                       }
@@ -218,7 +273,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               <input
                 type="text"
                 placeholder="min"
-                className="input input-bordered w-full max-w-xs"
+                className="input input-bordered w-full max-w-xs "
                 onChange={(event) => {
                   setMinRange(event.target.value);
                 }}
@@ -235,7 +290,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             <div>
               <section>
                 <input
-                  className="w-full"
+                  className="w-full form-radio accent-blue-700"
                   type="range"
                   min={minRange}
                   max={maxRange}
@@ -256,16 +311,16 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             </div>
           </div>
         </div>
-        <div className="w-[75%] bg-green-200 rounded-xl flex flex-col gap-[1%]">
+        <div className="w-[75%] rounded-xl flex flex-col gap-[1%]">
           <div className="bg-blue-200 w-full h-[6%]"></div>
-          <div className="bg-yellow-200 w-full h-[93%] flex flex-col">
+          <div className=" w-full h-[93%] flex flex-col">
             {isLoadingFetchAllTransactionData && (
               <div className="w-full h-[200px] flex justify-center items-center ">
                 <span className="loading loading-spinner loading-md"></span>
               </div>
             )}
             {!isLoadingFetchAllTransactionData && (
-              <div className=" flex flex-col gap-6">
+              <div className=" flex flex-col gap-6 overflow-auto">
                 <div className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4">
                   <div className="">
                     <input type="checkbox" className="mr-3" />
@@ -276,12 +331,13 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 </div>
                 <div className="flex flex-col gap-5 overflow-auto">
                   <div>
-                    <p className="mb-3">Today</p>
+                    <p className="mb-3 font-semibold">Today</p>
                     <div className="flex flex-col gap-2">
                       {todayTransactionData &&
                         todayTransactionData.map((element) => {
-                          // const IconComponent =
-                          // iconComponentMap[element.category_image];
+                          const IconComponent =
+                            iconComponentMap[element.category_image];
+
                           return (
                             <div
                               key={element.id}
@@ -292,16 +348,32 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                                 <div
                                   // onClick={() => handleSelectCategory(element)}
 
-                                  className="flex w-full gap-3 rounded-t-md "
+                                  className="flex items-center w-full gap-3 rounded-t-md "
                                 >
-                                  {/* {IconComponent && (
-                              <IconComponent
-                                color={element.description}
-                                className="w-5 h-5"
-                              />
-                            )} */}
-                                  <div>icon</div>
-                                  <p className="text-black">{element.name}</p>
+                                  <div
+                                    style={{
+                                      background: `${element.category_color}`,
+                                    }}
+                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
+                                  >
+                                    {IconComponent && (
+                                      <IconComponent
+                                        color="white"
+                                        className="w-5 h-5"
+                                      />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-black">
+                                      {element.category_name}
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                      {extractHourMinute(element.createdat)}
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                      {element.createdat}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
 
@@ -316,16 +388,216 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                     </div>
                   </div>
                   <div>
-                    <p>Yesterday</p>
+                    <p className="mb-3 font-semibold">Yesterday</p>
+                    <div className="flex flex-col gap-2">
+                      {yesterdayTransactionData &&
+                        yesterdayTransactionData.map((element) => {
+                          const IconComponent =
+                            iconComponentMap[element.category_image];
+                          return (
+                            <div
+                              key={element.id}
+                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
+                            >
+                              <div className="flex items-center">
+                                <input type="checkbox" className="mr-3" />
+                                <div
+                                  // onClick={() => handleSelectCategory(element)}
+
+                                  className="flex items-center w-full gap-3 rounded-t-md "
+                                >
+                                  <div
+                                    style={{
+                                      background: `${element.category_color}`,
+                                    }}
+                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
+                                  >
+                                    {IconComponent && (
+                                      <IconComponent
+                                        color="white"
+                                        className="w-5 h-5"
+                                      />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-black">
+                                      {element.category_name}
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                      {extractHourMinute(element.createdat)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p>
+                                {element.transaction_type === "INC"
+                                  ? element.amount
+                                  : -element.amount}
+                              </p>
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
                   <div>
-                    <p>A week ago</p>
+                    <p className="mb-3 font-semibold">A week ago</p>
+                    <div className="flex flex-col gap-2">
+                      {lastWeekTransactionData &&
+                        lastWeekTransactionData.map((element) => {
+                          const IconComponent =
+                            iconComponentMap[element.category_image];
+                          return (
+                            <div
+                              key={element.id}
+                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
+                            >
+                              <div className="flex items-center">
+                                <input type="checkbox" className="mr-3" />
+                                <div
+                                  // onClick={() => handleSelectCategory(element)}
+
+                                  className="flex items-center w-full gap-3 rounded-t-md "
+                                >
+                                  <div
+                                    style={{
+                                      background: `${element.category_color}`,
+                                    }}
+                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
+                                  >
+                                    {IconComponent && (
+                                      <IconComponent
+                                        color="white"
+                                        className="w-5 h-5"
+                                      />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-black">
+                                      {element.category_name}
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                      {extractHourMinute(element.createdat)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p>
+                                {element.transaction_type === "INC"
+                                  ? element.amount
+                                  : -element.amount}
+                              </p>
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
                   <div>
-                    <p>A month ago</p>
+                    <p className="mb-3 font-semibold">A month ago</p>
+                    <div className="flex flex-col gap-2">
+                      {lastMonthTransactionData &&
+                        lastMonthTransactionData.map((element) => {
+                          const IconComponent =
+                            iconComponentMap[element.category_image];
+                          return (
+                            <div
+                              key={element.id}
+                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
+                            >
+                              <div className="flex items-center">
+                                <input type="checkbox" className="mr-3" />
+                                <div
+                                  // onClick={() => handleSelectCategory(element)}
+
+                                  className="flex items-center w-full gap-3 rounded-t-md "
+                                >
+                                  <div
+                                    style={{
+                                      background: `${element.category_color}`,
+                                    }}
+                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
+                                  >
+                                    {IconComponent && (
+                                      <IconComponent
+                                        color="white"
+                                        className="w-5 h-5"
+                                      />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-black">
+                                      {element.category_name}
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                      {extractHourMinute(element.createdat)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p>
+                                {element.transaction_type === "INC"
+                                  ? element.amount
+                                  : -element.amount}
+                              </p>
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
                   <div>
-                    <p>3 months ago</p>
+                    <p className="mb-3 font-semibold">3 months ago</p>
+                    <div className="flex flex-col gap-2">
+                      {last3MonthsTransactionData &&
+                        last3MonthsTransactionData.map((element) => {
+                          const IconComponent =
+                            iconComponentMap[element.category_image];
+                          return (
+                            <div
+                              key={element.id}
+                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
+                            >
+                              <div className="flex items-center">
+                                <input type="checkbox" className="mr-3" />
+                                <div
+                                  // onClick={() => handleSelectCategory(element)}
+
+                                  className="flex items-center w-full gap-3 rounded-t-md "
+                                >
+                                  <div
+                                    style={{
+                                      background: `${element.category_color}`,
+                                    }}
+                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
+                                  >
+                                    {IconComponent && (
+                                      <IconComponent
+                                        color="white"
+                                        className="w-5 h-5"
+                                      />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-black">
+                                      {element.category_name}
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                      {extractHourMinute(element.createdat)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p>
+                                {element.transaction_type === "INC"
+                                  ? element.amount
+                                  : -element.amount}
+                              </p>
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
                 </div>
               </div>

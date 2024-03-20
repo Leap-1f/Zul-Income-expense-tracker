@@ -8,6 +8,6 @@ todo:
 2. SignUp step2 component 025000 => 25,000
 3. front deer password hashlah
 4. responsive
-5. addRecord transaction backend
+5. date   zov hadgalah
 6. Amount $ || ₮
 7. Navbar dashboard record active:text-bold

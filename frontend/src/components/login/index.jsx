@@ -75,6 +75,7 @@ export const LogIn = () => {
         const response = await res.json();
         console.log(response);
         if (response.success) {
+          localStorage.setItem("token", response.token);
           push("/dashboard");
         } else if (response.message === "failed") {
           setWarningMessage("Password does not match.");

@@ -5,12 +5,12 @@ export const getAllTransaction = async (req, res) => {
 
   try {
     const data = await sql`SELECT 
-    tar.*, 
-    cat.description as category_color, 
-    cat.name category_name, 
-    cat.category_image 
-  FROM transaction tar 
-    inner join category cat on tar.category_id = cat.id;`;
+        tar.*, 
+        cat.description as category_color, 
+        cat.name category_name, 
+        cat.category_image 
+      FROM transaction tar 
+        inner join category cat on tar.category_id = cat.id;`;
     res.send(data);
   } catch (err) {
     console.log(err);
@@ -18,7 +18,16 @@ export const getAllTransaction = async (req, res) => {
 };
 
 export const postTransaction = async (req, res) => {
-  const { payee, amount,switchOne, note, date, time, categoryId, dateAndTime } = req.body;
+  const {
+    payee,
+    amount,
+    switchOne,
+    note,
+    date,
+    time,
+    categoryId,
+    dateAndTime,
+  } = req.body;
   try {
     const data = await sql`SELECT * FROM transaction`;
     const newTransaction =
@@ -31,8 +40,9 @@ export const postTransaction = async (req, res) => {
 };
 export const createTable = async (req, res) => {
   try {
-    const data =
-      await sql`CREATE TABLE ${sql(tableName)}(id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), 
+    const data = await sql`CREATE TABLE ${sql(
+      tableName
+    )}(id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), 
       user_id uuid REFERENCES users(id), 
       name TEXT, 
       amount REAL NOT NULL, 

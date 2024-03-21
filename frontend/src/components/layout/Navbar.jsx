@@ -1,21 +1,44 @@
+import { useRouter } from "next/router";
 import { Vector } from "../utils/IconGeld";
 import Link from "next/link";
-
+import { useEffect } from "react";
 export const Navbar = ({ setShowAddRecordPopUp }) => {
+  const {push} = useRouter();
+  const logOut = () => {
+    localStorage.removeItem('id');
+        push("/");
+  }
+  const handleDashboard = () => {
+    const id = localStorage.getItem('id');
+    if (id) {
+      push('/dashboard');
+    } else {
+      push('/');
+    }
+  }
+  const handleRecord = () => {
+    const id = localStorage.getItem('id');
+    if (id) {
+      push('/record');
+    } else {
+      push('/');
+    }
+  }
+
   return (
     <div className="bg-white h-[8vh]">
       <div className="max-w-screen-lg navbar h-full m-auto ">
         <div className="flex-1 items-center gap-6">
           <Vector />
-          <Link
+          <div onClick={handleDashboard}
             href="/dashboard"
             className="active:scale-95 transition visited:text-bold"
           >
             Dashboard
-          </Link>
-          <Link href="/record" className="active:scale-95 transition">
+          </div>
+          <div onClick={handleRecord} href="/record" className="active:scale-95 transition">
             Records
-          </Link>
+          </div>
         </div>
         <div className="flex-none items-center gap-6">
           <button
@@ -51,9 +74,12 @@ export const Navbar = ({ setShowAddRecordPopUp }) => {
               <li>
                 <a>Settings</a>
               </li>
-              <li>
+          
+              <li onClick={logOut}>
                 <a>Logout</a>
               </li>
+           
+              
             </ul>
           </div>
         </div>

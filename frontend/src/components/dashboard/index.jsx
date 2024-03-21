@@ -93,7 +93,7 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-full flex flex-col justify-between py-6">
+    <div className="h-full flex flex-col justify-between gap-3 py-6">
       <div className="flex justify-between h-[25%]">
         <CashCard />
         <TotalBox
@@ -112,22 +112,22 @@ export const Dashboard = () => {
         />
       </div>
       <div className="flex gap-5 h-[27%] *:w-1/2">
-        <div className="bg-white rounded-xl lg:h-[280px] p-3 flex flex-col gap-3">
+        <div className="bg-white rounded-xl lg:h-full p-3 flex flex-col gap-3">
           <div className="font-bold border-b h-[10%]">Income - Expense</div>
           <div className="h-[90%] w-full">
             <BarChart />
           </div>
         </div>
-        <div className="bg-white rounded-xl lg:h-[280px] p-3 flex flex-col gap-3">
+        <div className="bg-white rounded-xl lg:h-full lg:relative p-3 flex flex-col gap-3">
           <div className="font-bold border-b h-[10%]">Income - Expense</div>
-          <div className="lg:h-[230px] w-full">
+          <div className="lg:h-[230px] w-full lg:absolute -top-3">
             <DoughnutChart />
           </div>
         </div>
       </div>
       <div className="bg-white rounded-xl h-[500px] overflow-auto">
         <p className="p-3 font-bold">Last records</p>
-        <div className="px-5">
+        <div className="px-5 overflow-auto">
           {latestTenDates &&
             latestTenDates.map((element) => {
               const date = new Date(`${element.createdat}`);
@@ -165,7 +165,7 @@ export const Dashboard = () => {
                   <p>
                     {element.transaction_type === "INC"
                       ? element.amount
-                      : -element.amount}
+                      : -element.amount}₮
                   </p>
                 </div>
               );

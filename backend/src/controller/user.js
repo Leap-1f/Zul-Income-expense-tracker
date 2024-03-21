@@ -71,19 +71,19 @@ export const login = async (req, res) => {
     }
     const isValid = await bcryct.compare(password, data[0].password);
     if (isValid) {
-      const userInfo = {
-        id: data[0].id,
-        name: data[0].name,
-      };
+      // const userInfo = {
+      //   id: data[0].id,
+      //   name: data[0].name,
+      // };
 
-      const token = jwt.sign(data[0], process.env.JWT_SECRET, {
-        expiresIn: "1d",
-      });
+      // const token = jwt.sign(data[0], process.env.JWT_SECRET, {
+      //   expiresIn: "1d",
+      // });
       res.send({
         success: true,
         statusCode: 200,
-        token: token,
-        user: { userId: data.id, email: data.email, password: data.password },
+        // token: token,
+        user: data[0],
       });
     } else {
       res.send({

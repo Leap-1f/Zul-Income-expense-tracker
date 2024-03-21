@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { iconComponentMap } from "../utils/CategoryIcons";
+import { useContext } from "react";
+import { Context } from "../utils/context";
 
 export const Record = ({ setShowAddRecordPopUp }) => {
+  let { selectedCategoryData } = useContext(Context);
   const [minRange, setMinRange] = useState(0);
   const [maxRange, setMaxRange] = useState(10000);
   const [allCategoryData, setAllCategoryData] = useState();
@@ -13,7 +16,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     setIsLoadingFetchAllTransactionData,
   ] = useState(false);
 
-  const fetchAllCategoryData = async () => {
+  const fetchAllTransactionData = async () => {
     try {
       setIsLoadingFetchAllTransactionData(true);
       const res = await fetch(
@@ -35,7 +38,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
       console.log(err);
     }
   };
-  const fetchAllTransactionData = async () => {
+  const fetchAllCategoryData = async () => {
     try {
       setIsLoadingFetchAllCategoryData(true);
       const res = await fetch(
@@ -52,11 +55,23 @@ export const Record = ({ setShowAddRecordPopUp }) => {
       ).then((res) => res.json());
 
       setAllCategoryData(res);
+      if(selectedCategoryData.length  !== 0){
+        addCategoryData(selectedCategoryData)
+      }
       setIsLoadingFetchAllCategoryData(false);
     } catch (err) {
       console.log(err);
     }
   };
+  const addCategoryData = (newData) => {
+    console.log(newData, "its new data");
+    allCategoryData?.push(newData)
+    // setAllCategoryData((prev) => [...prev, newData]);
+
+    console.log("its category data", allCategoryData);
+  };
+  console.log(selectedCategoryData);
+ 
 
   const arr = [
     { name: "1honog", date: "2024-03-19 09:23:00" },
@@ -157,6 +172,9 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     fetchAllCategoryData();
     fetchAllTransactionData();
   }, []);
+  useEffect(() => {
+addCategoryData()
+  },[selectedCategoryData])
   const extractHourMinute = (dateString) => {
     const dateObj = new Date(dateString);
     const hour = dateObj.getHours();
@@ -321,13 +339,13 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             )}
             {!isLoadingFetchAllTransactionData && (
               <div className=" flex flex-col gap-6 overflow-auto">
-                <div className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4">
+                <div className="w-full flex justify-between items-center rounded-xl h-[48px] bg-white px-4">
                   <div className="">
                     <input type="checkbox" className="mr-3" />
                     <label htmlFor="">Select all</label>
                   </div>
 
-                  <p>35500</p>
+                  <p className="">35500₮</p>
                 </div>
                 <div className="flex flex-col gap-5 overflow-auto">
                   <div>
@@ -380,7 +398,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                               <p>
                                 {element.transaction_type === "INC"
                                   ? element.amount
-                                  : -element.amount}
+                                  : -element.amount}₮
                               </p>
                             </div>
                           );
@@ -433,7 +451,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                               <p>
                                 {element.transaction_type === "INC"
                                   ? element.amount
-                                  : -element.amount}
+                                  : -element.amount}₮
                               </p>
                             </div>
                           );
@@ -486,7 +504,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                               <p>
                                 {element.transaction_type === "INC"
                                   ? element.amount
-                                  : -element.amount}
+                                  : -element.amount}₮
                               </p>
                             </div>
                           );
@@ -539,7 +557,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                               <p>
                                 {element.transaction_type === "INC"
                                   ? element.amount
-                                  : -element.amount}
+                                  : -element.amount}₮
                               </p>
                             </div>
                           );
@@ -592,7 +610,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                               <p>
                                 {element.transaction_type === "INC"
                                   ? element.amount
-                                  : -element.amount}
+                                  : -element.amount}₮
                               </p>
                             </div>
                           );

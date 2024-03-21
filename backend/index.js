@@ -11,36 +11,36 @@ const port = 9090;
 app.use(cors());
 app.use(express.json());
 
-const logRequest = (req, res, next) => {
-  console.log("req.method", req.method);
-  const authHeader = req.headers.authorization;
+// const logRequest = (req, res, next) => {
+//   console.log("req.method", req.method);
+//   const authHeader = req.headers.authorization;
 
-  console.log(authHeader, " -------------------------");
+//   console.log(authHeader, " -------------------------");
 
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    // Extract the token part of the Authorization header
-    const token = authHeader.substring(7);
-    try {
-      jwt.verify(token, process.env.JWT_SECRET);
-    } catch (exp) {
-      console.log(exp, " is eexp");
-      res.send("bearer token is invalid");
-      // res.send(`Bearer token: ${token}`);
-      return;
-    }
-    // res.send(`Bearer token: ${token}`);
-  } else {
-    res.send("No bearer token provided");
-  }
+//   if (authHeader && authHeader.startsWith("Bearer ")) {
+//     // Extract the token part of the Authorization header
+//     const token = authHeader.substring(7);
+//     try {
+//       jwt.verify(token, process.env.JWT_SECRET);
+//     } catch (exp) {
+//       console.log(exp, " is eexp");
+//       res.send("bearer token is invalid");
+//       // res.send(`Bearer token: ${token}`);
+//       return;
+//     }
+//     // res.send(`Bearer token: ${token}`);
+//   } else {
+//     res.send("No bearer token provided");
+//   }
 
-  if (req.body.name === "bat") {
-    res.send("batig orulahgu");
-  }
-  next();
-};
+//   if (req.body.name === "bat") {
+//     res.send("batig orulahgu");
+//   }
+//   next();
+// };
 // middleware, authorization
 
-app.use(logRequest);
+// app.post(logRequest); 
 app.use("/api/", user);
 app.use("/api", category);
 app.use("/api/transaction", transaction);

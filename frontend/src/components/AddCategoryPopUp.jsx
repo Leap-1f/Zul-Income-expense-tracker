@@ -1,8 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowDropDown, Home } from "./utils/CategoryIcons";
 import { categoryIcons } from "./utils/CategoryIcons";
 import { LogIn } from "./login";
 import { MdHome } from "react-icons/md";
+import { useContext } from "react";
+import { Context } from "./utils/context";
 
 export const AddCategoryPopUp = ({
   setShowAddRecordPopUp,
@@ -11,6 +13,7 @@ export const AddCategoryPopUp = ({
   setNewCategoryInfo,
   addCategoryData,
 }) => {
+  let { selectedCategoryData } = useContext(Context);
   const [selectedIconIndex, setSelectedIconIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState("gray");
   const [categoryIconsBox, setCategoryIconsBox] = useState(false);
@@ -72,7 +75,7 @@ export const AddCategoryPopUp = ({
 
   const addCategoryButton = async () => {
     setIsLoading(true);
-    let selectedCategoryData = [];
+    // let selectedCategoryData = [];
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_ENDPOINT}/api/select-category`,

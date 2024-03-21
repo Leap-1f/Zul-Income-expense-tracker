@@ -1,4 +1,3 @@
-
 import {
   MdHome,
   MdCardGiftcard,
@@ -96,6 +95,7 @@ export const iconComponentMap = {
   MdPublic: MdPublic,
   MdSportsBaseball: MdSportsBaseball,
 };
+
 
 export const Home = () => {
   return (

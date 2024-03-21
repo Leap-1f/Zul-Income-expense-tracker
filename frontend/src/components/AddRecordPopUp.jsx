@@ -27,25 +27,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
     categoryImg: MdHome.name,
     color: "gray",
   });
-  // const selectedCategoryId = async() => {
-  //   try{
-  //       const selectedCategoryId  = await fetch(
-  //         `${process.env.NEXT_PUBLIC_ENDPOINT}/api/select-category-id`,
-  //         {
-  //           method: "POST",
-  //           cache: "no-cache",
-  //           credentials: "same-origin", // include, *same-origin, omit
-  //           headers: {
-  //             Accept: "application/json, text/plain, */*",
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       ).then((res) => res.json());
 
-  //   } catch (err) {
-  // console.log(err);
-  //   }
-  // }
   const fetchData = async () => {
     setIsLoadingFetchAllCategoryData(true);
     try {
@@ -110,6 +92,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       // values.dateAndTime = values.date + "T" + values.time;
       values.dateAndTime = moment(`${values.date} ${values.time}`).format();
       console.log(values.dateAndTime, "dateandtime");
+      console.log(selectedCategoryInfo);
       try {
         const selectedCategoryId = await fetch(
           `${process.env.NEXT_PUBLIC_ENDPOINT}/api/select-category-id`,

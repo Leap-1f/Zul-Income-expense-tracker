@@ -52,6 +52,7 @@ export const AddRecordCategory = ({
               if (categoryData.length === 0) {
                 return <div>Empty</div>;
               } else {
+                console.log(iconComponentMap[element.category_image]);
                 const IconComponent = iconComponentMap[element.category_image];
 
                 return (

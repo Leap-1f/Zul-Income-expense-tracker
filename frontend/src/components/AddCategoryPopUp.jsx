@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ArrowDropDown, Home } from "./utils/CategoryIcons";
-import { categoryIcons } from "./utils/CategoryIcons";
-import { LogIn } from "./login";
+import { ArrowDropDown} from "./utils/CategoryIcons";
+import { iconComponentMap } from "./utils/CategoryIcons";
 import { MdHome } from "react-icons/md";
 import { useContext } from "react";
 import { Context } from "./utils/context";
@@ -13,8 +12,9 @@ export const AddCategoryPopUp = ({
   setNewCategoryInfo,
   addCategoryData,
 }) => {
+  const iconComponentMapArray = Object.entries(iconComponentMap);
   let { selectedCategoryData } = useContext(Context);
-  const [selectedIconIndex, setSelectedIconIndex] = useState(0);
+  const [selectedIconImage, setSelectedIconImage] = useState("MdHome");
   const [selectedColor, setSelectedColor] = useState("gray");
   const [categoryIconsBox, setCategoryIconsBox] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,23 +34,18 @@ export const AddCategoryPopUp = ({
       color: selectedColor,
     });
   }, [selectedColor]);
+
+
   const handleColorChange = (color) => {
     setSelectedColor(color);
-
-    console.log(selectedColor, "selected color");
-    const IconComponent = categoryIcons[selectedIconIndex];
-    console.log(IconComponent.name, "iconName");
-    if (IconComponent) {
-      setNewCategoryInfo({
-        ...newCategoryInfo,
-        categoryImg: `${IconComponent.name}`,
-      });
-    }
   };
 
-  const handleIconChange = (index) => {
-    setSelectedIconIndex(index);
-    const IconComponent = categoryIcons[index];
+  const handleIconChange = (key) => {
+    setSelectedIconImage(key);
+    setNewCategoryInfo({
+      ...newCategoryInfo,
+      categoryImg: `${selectedIconImage}`,
+    });
   };
   function capitalizeFirstLetter(inputText) {
     if (!inputText || typeof inputText !== "string") {
@@ -66,10 +61,14 @@ export const AddCategoryPopUp = ({
     });
   };
   const renderSelectedIcon = () => {
-    const IconComponent = categoryIcons[selectedIconIndex];
-    if (IconComponent) {
+    const selectedIconComponent = iconComponentMapArray.find(
+      ([key]) => key === selectedIconImage
+    );
+    if (selectedIconComponent) {
+      const [, IconComponent] = selectedIconComponent;
       return <IconComponent color={selectedColor} className="w-5 h-5" />;
     }
+
     return null;
   };
 
@@ -88,6 +87,7 @@ export const AddCategoryPopUp = ({
           body: JSON.stringify(newCategoryInfo),
         }
       );
+      console.log(newCategoryInfo, "newcategoryInfo");
       selectedCategoryData = await res.json();
       setIsLoading(false);
     } catch (err) {
@@ -98,7 +98,7 @@ export const AddCategoryPopUp = ({
       setWarningMessage("This category is registered."),
         setNewCategoryInfo({
           categoryName: "",
-          categoryImg: MdHome.name,
+          categoryImg: "MdHome",
           color: "gray",
         });
       selectedCategoryData = [];
@@ -118,15 +118,11 @@ export const AddCategoryPopUp = ({
         );
         const data = await res.json();
         addCategoryData(data[data.length - 1][0]);
-        // addData(data);
-        //console.log(data, " its data from db after save");
-        //console.log("its data that what i want ", data[data.length - 1][0]);
-        // setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
       setSelectedColor("gray");
-      setSelectedIconIndex(0);
+      setSelectedIconImage("MdHome");
       setShowAddCategory(false);
     } else {
       console.log("selectedCategoryData.length  ?");
@@ -143,8 +139,9 @@ export const AddCategoryPopUp = ({
         ></div>
 
         <div
-        style={{ opacity: isLoading ? "0.7" : "1" }}
-         className="w-[500px] h-[240px] p-5 rounded-xl bg-white absolute top-[100px] left-center z-3 shadow-2xl">
+          style={{ opacity: isLoading ? "0.7" : "1" }}
+          className="w-[500px] h-[240px] p-5 rounded-xl bg-white absolute top-[100px] left-center z-3 shadow-2xl"
+        >
           <div className="relative h-full">
             <div className="flex flex-col justify-between h-full">
               <div className="flex justify-between items-start border-b pb-3">
@@ -186,15 +183,17 @@ export const AddCategoryPopUp = ({
                   <div className="w-[300px] h-[300px] bg-white absolute top-[50px] rounded-md shadow-xl p-3">
                     <div className="flex flex-col h-full justify-between">
                       <div className="grid grid-cols-6 h-full">
-                        {categoryIcons.map((IconComponent, index) => (
-                          <div
-                            className="flex justify-center items-center p-1 "
-                            key={index}
-                            onClick={() => handleIconChange(index)}
-                          >
-                            <IconComponent color="gray" className="w-5 h-5" />
-                          </div>
-                        ))}
+                        {iconComponentMapArray.map(
+                          ([key, IconComponent], index) => (
+                            <div
+                              className="flex justify-center items-center p-1"
+                              key={index}
+                              onClick={() => handleIconChange(key)}
+                            >
+                              <IconComponent color="gray" className="w-5 h-5" />
+                            </div>
+                          )
+                        )}
                       </div>
                       <div className="flex justify-between mx-3 *:w-6 *:h-6 *:rounded-full *:text-center border-t pt-4">
                         {[

@@ -44,7 +44,7 @@ export const AddCategoryPopUp = ({
     setSelectedIconImage(key);
     setNewCategoryInfo({
       ...newCategoryInfo,
-      categoryImg: `${selectedIconImage}`,
+      categoryImg: `${key}`,
     });
   };
   function capitalizeFirstLetter(inputText) {
@@ -77,7 +77,7 @@ export const AddCategoryPopUp = ({
     // let selectedCategoryData = [];
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/select-category`,
+        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category/select-category`,
         {
           headers: {
             Accept: "application/json",

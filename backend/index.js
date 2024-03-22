@@ -42,7 +42,7 @@ app.use(express.json());
 
 // app.post(logRequest); 
 app.use("/api/", user);
-app.use("/api", category);
+app.use("/api/category", category);
 app.use("/api/transaction", transaction);
 
 app.listen(port, () => {

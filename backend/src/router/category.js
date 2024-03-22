@@ -8,6 +8,6 @@ category.route("/select-category").post(getSelectCategory);
 
 category.route("/select-category-id").post(getSelectCategoryId);
 
-category.route("/category").get(getAllCategories).post(postCategory);
+category.route("/").get(getAllCategories).post(postCategory);
 category.route("/table").post(createTable).delete(dropTable);
 export { category };

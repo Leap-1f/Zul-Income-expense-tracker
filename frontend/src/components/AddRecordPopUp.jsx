@@ -95,7 +95,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       console.log(selectedCategoryInfo);
       try {
         const selectedCategoryId = await fetch(
-          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/select-category-id`,
+          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category/select-category-id`,
           {
             method: "POST",
             cache: "no-cache",

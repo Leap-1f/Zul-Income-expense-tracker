@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { iconComponentMap } from "../utils/CategoryIcons";
 import { useContext } from "react";
 import { Context } from "../utils/context";
+import { TransactionDataByDate } from "./TransactionDataByDate";
 
 export const Record = ({ setShowAddRecordPopUp }) => {
   let { selectedCategoryData } = useContext(Context);
   const [minRange, setMinRange] = useState(0);
-  const [maxRange, setMaxRange] = useState(10000);
+  const [maxRange, setMaxRange] = useState(100000);
   const [allCategoryData, setAllCategoryData] = useState();
   const [allTransactionData, setAllTransactionData] = useState();
   const [isLoadingFetchAllCategoryData, setIsLoadingFetchAllCategoryData] =
@@ -15,38 +16,23 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     isLoadingFetchAllTransactionData,
     setIsLoadingFetchAllTransactionData,
   ] = useState(false);
+  const [filteredData, setFilteredDate] = useState();
+  const [filterAttribute, setFilterAttribute] = useState({
+    selectedCatId: "",
+    selectedType: "ALL",
+    rangeLow: minRange,
+    rangeHigh: maxRange,
+  });
 
-  const fetchAllTransactionData = async () => {
-    try {
-      setIsLoadingFetchAllTransactionData(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/transaction`,
-        {
-          method: "GET",
-          cache: "no-cache",
-          credentials: "same-origin", // include, *same-origin, omit
-          headers: {
-            Accept: "application/json, text/plain, */*",
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((res) => res.json());
-
-      setAllTransactionData(res);
-      setIsLoadingFetchAllTransactionData(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const fetchAllCategoryData = async () => {
+  const fetchData = async (endpoint) => {
     try {
       setIsLoadingFetchAllCategoryData(true);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category`,
+        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/${endpoint}`,
         {
           method: "GET",
           cache: "no-cache",
-          credentials: "same-origin", // include, *same-origin, omit
+          credentials: "same-origin",
           headers: {
             Accept: "application/json, text/plain, */*",
             "Content-Type": "application/json",
@@ -54,134 +40,106 @@ export const Record = ({ setShowAddRecordPopUp }) => {
         }
       ).then((res) => res.json());
 
-      setAllCategoryData(res);
-      if(selectedCategoryData.length  !== 0){
-        addCategoryData(selectedCategoryData)
+      if (endpoint === "category") {
+        setAllCategoryData(res);
+        if (selectedCategoryData.length !== 0) {
+          addCategoryData(selectedCategoryData);
+        }
+      } else if (endpoint === "transaction") {
+        setAllTransactionData(res);
       }
       setIsLoadingFetchAllCategoryData(false);
     } catch (err) {
       console.log(err);
     }
   };
+
   const addCategoryData = (newData) => {
     console.log(newData, "its new data");
-    allCategoryData?.push(newData)
+    allCategoryData?.push(newData);
     // setAllCategoryData((prev) => [...prev, newData]);
 
     console.log("its category data", allCategoryData);
   };
   console.log(selectedCategoryData);
- 
 
-  const arr = [
-    { name: "1honog", date: "2024-03-19 09:23:00" },
-    { name: "1henhonog", date: "2024-03-19 09:00:00" },
-    { name: "2honog", date: "2024-03-18 09:23:00" },
-    { name: "2honog", date: "2024-03-18 09:29:00" },
-    { name: "7honog", date: "2024-03-13 09:29:00" },
-    { name: "7hhhonog", date: "2024-03-13 09:29:00" },
-  ];
-  // Function to parse date strings into Date objects
-  const parseDate = (dateString) => new Date(dateString);
-
-  // Function to check if a date is from "yesterday"
-  const isYesterday = (date) => {
-    const now = new Date();
-    const yesterday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 1
-    );
-    return date.setHours(0, 0, 0, 0) === yesterday.setHours(0, 0, 0, 0);
+  const filterDataByDate = (data, startDate, endDate) => {
+    return data
+      ?.filter((item) => {
+        const itemDate = new Date(item.createdat);
+        return itemDate >= startDate && itemDate <= endDate;
+      })
+      .sort((a, b) => new Date(a.createdat) - new Date(b.createdat));
   };
 
-  // Function to check if a date is from "today"
-  const isToday = (date) => {
+  const getTransactionDataByDateRange = (dateRange) => {
     const now = new Date();
-    return date.setHours(0, 0, 0, 0) === now.setHours(0, 0, 0, 0);
-  };
-  // Function to check if a date is within the last week (excluding today and yesterday)
-  const isWithinLastWeek = (date) => {
-    const now = new Date();
-    const lastWeekStart = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 7
-    );
-    return date >= lastWeekStart && !isToday(date) && !isYesterday(date);
+    let startDate, endDate;
+
+    switch (dateRange) {
+      case "today":
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() + 1
+        );
+        break;
+      case "yesterday":
+        startDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() - 1
+        );
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case "lastWeek":
+        startDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() - 7
+        );
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case "lastMonth":
+        startDate = new Date(
+          now.getFullYear(),
+          now.getMonth() - 1,
+          now.getDate()
+        );
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case "last3Months":
+        startDate = new Date(
+          now.getFullYear(),
+          now.getMonth() - 3,
+          now.getDate()
+        );
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      default:
+        return [];
+    }
+
+    return filterDataByDate(allTransactionData, startDate, endDate);
   };
 
-  // Function to check if a date is within the last month (excluding the latest week's data)
-  const isWithinLastMonth = (date) => {
-    const now = new Date();
-    const lastMonthStart = new Date(
-      now.getFullYear(),
-      now.getMonth() - 1,
-      now.getDate()
-    );
-    return (
-      date >= lastMonthStart &&
-      !isWithinLastWeek(date) &&
-      !isToday(date) &&
-      !isYesterday(date)
-    );
-  };
-  const isWithinLast3Months = (date) => {
-    const now = new Date();
-    const lastMonthStart = new Date(
-      now.getFullYear(),
-      now.getMonth() - 3,
-      now.getDate()
-    );
-    return (
-      date >= lastMonthStart &&
-      !isWithinLastMonth(date) &&
-      !isWithinLastWeek(date) &&
-      !isToday(date) &&
-      !isYesterday(date)
-    );
-  };
-  // Separate the data into "yesterday" and "today"
-  const yesterdayTransactionData = allTransactionData
-    ?.filter((item) => isYesterday(parseDate(item.createdat)))
-    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
-  const todayTransactionData = allTransactionData
-    ?.filter((item) => isToday(parseDate(item.createdat)))
-    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
-  const lastWeekTransactionData = allTransactionData
-    ?.filter((item) => isWithinLastWeek(parseDate(item.createdat)))
-    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
-  const lastMonthTransactionData = allTransactionData
-    ?.filter((item) => isWithinLastMonth(parseDate(item.createdat)))
-    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
-  const last3MonthsTransactionData = allTransactionData
-    ?.filter((item) => isWithinLast3Months(parseDate(item.createdat)))
-    .sort((a, b) => parseDate(a.createdat) - parseDate(b.createdat));
-  console.log("Yesterday's data:", yesterdayTransactionData);
-  console.log("Today's data:", todayTransactionData);
-  // console.log(allCategoryData);
-
-  // // Sort the array in descending order
-  // allTransactionData?.sort(
-  //   (a, b) => new Date(b.createdat) - new Date(a.createdat)
-  // );
-
-  // // Get the latest 5 dates
-  // const latestTenDates = allTransactionData?.slice(0, 10);
   useEffect(() => {
-    fetchAllCategoryData();
-    fetchAllTransactionData();
+    fetchData("category");
+    fetchData("transaction");
   }, []);
-  useEffect(() => {
-addCategoryData()
-  },[selectedCategoryData])
-  const extractHourMinute = (dateString) => {
-    const dateObj = new Date(dateString);
-    const hour = dateObj.getHours();
-    const minute = dateObj.getMinutes();
-    return `${hour}:${minute}`;
-  };
 
+  useEffect(() => {
+    addCategoryData(selectedCategoryData);
+  }, [selectedCategoryData]);
+
+  const todayTransactionData = getTransactionDataByDateRange("today");
+  const yesterdayTransactionData = getTransactionDataByDateRange("yesterday");
+  const lastWeekTransactionData = getTransactionDataByDateRange("lastWeek");
+  const lastMonthTransactionData = getTransactionDataByDateRange("lastMonth");
+  const last3MonthsTransactionData =
+    getTransactionDataByDateRange("last3Months");
+  console.log(filterAttribute, "filteredAtt");
   return (
     <div className=" bg-gray-100">
       <div className="h-[92vh] py-5 flex gap-5 max-w-screen-lg m-auto">
@@ -206,29 +164,47 @@ addCategoryData()
             <input
               type="radio"
               class="form-radio accent-blue-700"
-              id="html"
-              name="fav_language"
-              value="HTML"
+              id="all"
+              value="ALL"
+              checked={filterAttribute.selectedType === "ALL"}
+              onChange={(e) =>
+                setFilterAttribute((prev) => ({
+                  ...prev,
+                  selectedType: e.target.value,
+                }))
+              }
             />
-              <label for="html">All</label>
+              <label for="all">All</label>
             <br /> {" "}
             <input
               type="radio"
-              id="css"
-              name="fav_language"
-              value="CSS"
+              id="income"
+              value="INC"
               class="form-radio accent-blue-700"
+              checked={filterAttribute.selectedType === "INC"}
+              onChange={(e) =>
+                setFilterAttribute((prev) => ({
+                  ...prev,
+                  selectedType: e.target.value,
+                }))
+              }
             />
-              <label for="css">Income</label>
+              <label for="income">Income</label>
             <br /> {" "}
             <input
               type="radio"
-              id="javascript"
-              name="fav_language"
-              value="JavaScript"
+              id="expense"
+              value="EXP"
               class="form-radio accent-blue-700"
+              checked={filterAttribute.selectedType === "EXP"}
+              onChange={(e) =>
+                setFilterAttribute((prev) => ({
+                  ...prev,
+                  selectedType: e.target.value,
+                }))
+              }
             />
-              <label for="javascript">Expense</label>
+              <label for="expense">Expense</label>
           </div>
           <div className="h-[80%] overflow-auto">
             <p className="font-medium">Category</p>
@@ -250,7 +226,12 @@ addCategoryData()
 
                         return (
                           <div
-                            // onClick={() => handleSelectCategory(element)}
+                            onClick={() =>
+                              setFilterAttribute((prevState) => ({
+                                ...prevState,
+                                selectedCatId: element.id,
+                              }))
+                            }
                             key={element.id}
                             className="flex w-full pl-1 py-2 justify-between cursor-pointer items-center rounded-md hover:bg-gray-50 active:scale-95"
                           >
@@ -289,18 +270,26 @@ addCategoryData()
             <p className="font-medium">Amount range</p>
             <div className="flex *:w-[49%] *:h-10 justify-between">
               <input
-                type="text"
+                type="number"
                 placeholder="min"
                 className="input input-bordered w-full max-w-xs "
                 onChange={(event) => {
+                  // setFilterAttribute((prevState) => ({
+                  //   ...prevState,
+                  //   rangeLow: event.target.value,
+                  // }))
                   setMinRange(event.target.value);
                 }}
               />
               <input
-                type="text"
+                type="number"
                 placeholder="max"
                 className="input input-bordered w-full max-w-xs"
                 onChange={(event) => {
+                  // setFilterAttribute((prevState) => ({
+                  //   ...prevState,
+                  //   rangeHigh: event.target.value,
+                  // }))
                   setMaxRange(event.target.value);
                 }}
               />
@@ -311,20 +300,25 @@ addCategoryData()
                   className="w-full form-radio accent-blue-700"
                   type="range"
                   min={minRange}
+                  // min={filterAttribute.rangeLow}
                   max={maxRange}
-                  step={10}
-                  // value={volume}
-                  // onChange={(event) => {
-                  //   setVolume(event.target.valueAsNumber);
-                  // }}
+                  // max={filterAttribute.rangeHigh}
+                  step={100}
+                  value={filterAttribute.rangeHigh}
+                  onChange={(event) => {
+                    setFilterAttribute((prevState) => ({
+                      ...prevState,
+                      rangeHigh: event.target.valueAsNumber,
+                    }));
+                    // setFilterAttribute((prev) => event.target.valueAsNumber);
+                  }}
                 />
-                {/* <button onClick={() => setMuted(m => !m)}>
-          {muted ? "muted" : "unmuted"}
-        </button> */}
               </section>
               <div className="flex justify-between">
                 <p>{minRange}</p>
+                {/* <p>{filterAttribute.rangeLow}</p> */}
                 <p>{maxRange}</p>
+                {/* <p>{filterAttribute.rangeHigh}</p> */}
               </div>
             </div>
           </div>
@@ -348,275 +342,26 @@ addCategoryData()
                   <p className="">35500₮</p>
                 </div>
                 <div className="flex flex-col gap-5 overflow-auto">
-                  <div>
-                    <p className="mb-3 font-semibold">Today</p>
-                    <div className="flex flex-col gap-2">
-                      {todayTransactionData &&
-                        todayTransactionData.map((element) => {
-                          const IconComponent =
-                            iconComponentMap[element.category_image];
-
-                          return (
-                            <div
-                              key={element.id}
-                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
-                            >
-                              <div className="flex items-center">
-                                <input type="checkbox" className="mr-3" />
-                                <div
-                                  // onClick={() => handleSelectCategory(element)}
-
-                                  className="flex items-center w-full gap-3 rounded-t-md "
-                                >
-                                  <div
-                                    style={{
-                                      background: `${element.category_color}`,
-                                    }}
-                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
-                                  >
-                                    {IconComponent && (
-                                      <IconComponent
-                                        color="white"
-                                        className="w-5 h-5"
-                                      />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <p className="text-black">
-                                      {element.category_name}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      {extractHourMinute(element.createdat)}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      {element.createdat}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <p>
-                                {element.transaction_type === "INC"
-                                  ? element.amount
-                                  : -element.amount}₮
-                              </p>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="mb-3 font-semibold">Yesterday</p>
-                    <div className="flex flex-col gap-2">
-                      {yesterdayTransactionData &&
-                        yesterdayTransactionData.map((element) => {
-                          const IconComponent =
-                            iconComponentMap[element.category_image];
-                          return (
-                            <div
-                              key={element.id}
-                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
-                            >
-                              <div className="flex items-center">
-                                <input type="checkbox" className="mr-3" />
-                                <div
-                                  // onClick={() => handleSelectCategory(element)}
-
-                                  className="flex items-center w-full gap-3 rounded-t-md "
-                                >
-                                  <div
-                                    style={{
-                                      background: `${element.category_color}`,
-                                    }}
-                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
-                                  >
-                                    {IconComponent && (
-                                      <IconComponent
-                                        color="white"
-                                        className="w-5 h-5"
-                                      />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <p className="text-black">
-                                      {element.category_name}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      {extractHourMinute(element.createdat)}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <p>
-                                {element.transaction_type === "INC"
-                                  ? element.amount
-                                  : -element.amount}₮
-                              </p>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="mb-3 font-semibold">A week ago</p>
-                    <div className="flex flex-col gap-2">
-                      {lastWeekTransactionData &&
-                        lastWeekTransactionData.map((element) => {
-                          const IconComponent =
-                            iconComponentMap[element.category_image];
-                          return (
-                            <div
-                              key={element.id}
-                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
-                            >
-                              <div className="flex items-center">
-                                <input type="checkbox" className="mr-3" />
-                                <div
-                                  // onClick={() => handleSelectCategory(element)}
-
-                                  className="flex items-center w-full gap-3 rounded-t-md "
-                                >
-                                  <div
-                                    style={{
-                                      background: `${element.category_color}`,
-                                    }}
-                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
-                                  >
-                                    {IconComponent && (
-                                      <IconComponent
-                                        color="white"
-                                        className="w-5 h-5"
-                                      />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <p className="text-black">
-                                      {element.category_name}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      {extractHourMinute(element.createdat)}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <p>
-                                {element.transaction_type === "INC"
-                                  ? element.amount
-                                  : -element.amount}₮
-                              </p>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="mb-3 font-semibold">A month ago</p>
-                    <div className="flex flex-col gap-2">
-                      {lastMonthTransactionData &&
-                        lastMonthTransactionData.map((element) => {
-                          const IconComponent =
-                            iconComponentMap[element.category_image];
-                          return (
-                            <div
-                              key={element.id}
-                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
-                            >
-                              <div className="flex items-center">
-                                <input type="checkbox" className="mr-3" />
-                                <div
-                                  // onClick={() => handleSelectCategory(element)}
-
-                                  className="flex items-center w-full gap-3 rounded-t-md "
-                                >
-                                  <div
-                                    style={{
-                                      background: `${element.category_color}`,
-                                    }}
-                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
-                                  >
-                                    {IconComponent && (
-                                      <IconComponent
-                                        color="white"
-                                        className="w-5 h-5"
-                                      />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <p className="text-black">
-                                      {element.category_name}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      {extractHourMinute(element.createdat)}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <p>
-                                {element.transaction_type === "INC"
-                                  ? element.amount
-                                  : -element.amount}₮
-                              </p>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="mb-3 font-semibold">3 months ago</p>
-                    <div className="flex flex-col gap-2">
-                      {last3MonthsTransactionData &&
-                        last3MonthsTransactionData.map((element) => {
-                          const IconComponent =
-                            iconComponentMap[element.category_image];
-                          return (
-                            <div
-                              key={element.id}
-                              className="w-full flex justify-between items-center rounded-xl h-12 bg-white px-4"
-                            >
-                              <div className="flex items-center">
-                                <input type="checkbox" className="mr-3" />
-                                <div
-                                  // onClick={() => handleSelectCategory(element)}
-
-                                  className="flex items-center w-full gap-3 rounded-t-md "
-                                >
-                                  <div
-                                    style={{
-                                      background: `${element.category_color}`,
-                                    }}
-                                    className=" rounded-full w-7 h-7 flex items-center justify-center"
-                                  >
-                                    {IconComponent && (
-                                      <IconComponent
-                                        color="white"
-                                        className="w-5 h-5"
-                                      />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <p className="text-black">
-                                      {element.category_name}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      {extractHourMinute(element.createdat)}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <p>
-                                {element.transaction_type === "INC"
-                                  ? element.amount
-                                  : -element.amount}₮
-                              </p>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
+                  <TransactionDataByDate
+                    date={"Today"}
+                    transactionData={todayTransactionData}
+                  />
+                  <TransactionDataByDate
+                    date={"Yesterday"}
+                    transactionData={yesterdayTransactionData}
+                  />
+                  <TransactionDataByDate
+                    date={"Last week"}
+                    transactionData={lastWeekTransactionData}
+                  />
+                  <TransactionDataByDate
+                    date={"Last month"}
+                    transactionData={lastMonthTransactionData}
+                  />
+                  <TransactionDataByDate
+                    date={"Last 3 months"}
+                    transactionData={last3MonthsTransactionData}
+                  />
                 </div>
               </div>
             )}

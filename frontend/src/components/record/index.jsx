@@ -16,7 +16,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     isLoadingFetchAllTransactionData,
     setIsLoadingFetchAllTransactionData,
   ] = useState(false);
-  const [filteredData, setFilteredDate] = useState();
+  const [filteredData, setFilteredData] = useState();
   const [filterAttribute, setFilterAttribute] = useState({
     selectedCatId: "",
     selectedType: "ALL",
@@ -26,7 +26,10 @@ export const Record = ({ setShowAddRecordPopUp }) => {
 
   const fetchData = async (endpoint) => {
     try {
-      setIsLoadingFetchAllCategoryData(true);
+      if(endpoint === "category"){
+        setIsLoadingFetchAllCategoryData(true);
+      } else {setIsLoadingFetchAllTransactionData(true)}
+      
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_ENDPOINT}/api/${endpoint}`,
         {
@@ -45,10 +48,13 @@ export const Record = ({ setShowAddRecordPopUp }) => {
         if (selectedCategoryData.length !== 0) {
           addCategoryData(selectedCategoryData);
         }
+        setIsLoadingFetchAllCategoryData(false);
       } else if (endpoint === "transaction") {
         setAllTransactionData(res);
+        setFilteredData(res)
+        setIsLoadingFetchAllTransactionData(false);
       }
-      setIsLoadingFetchAllCategoryData(false);
+     
     } catch (err) {
       console.log(err);
     }
@@ -72,6 +78,21 @@ export const Record = ({ setShowAddRecordPopUp }) => {
       .sort((a, b) => new Date(a.createdat) - new Date(b.createdat));
   };
 
+  const filterTransactionDataByAttribute = () => {
+    let filteredDataByAttribute = allTransactionData;
+
+    if (filterAttribute.selectedCatId !== "") {
+       filteredDataByAttribute = filteredDataByAttribute?.filter((item) => item.category_id === filterAttribute.selectedCatId);
+    }
+    if (filterAttribute.selectedType !== "ALL") {
+       filteredDataByAttribute = filteredDataByAttribute?.filter((item) => item.transaction_type === filterAttribute.selectedType);
+    }
+    if (filterAttribute.rangeLow !== null && filterAttribute.rangeHigh !== null) {
+       filteredDataByAttribute = filteredDataByAttribute?.filter((item) => item.amount >= filterAttribute.rangeLow && item.amount <= filterAttribute.rangeHigh);
+    }
+    setFilteredData(filteredDataByAttribute);
+    
+   };
   const getTransactionDataByDateRange = (dateRange) => {
     const now = new Date();
     let startDate, endDate;
@@ -121,9 +142,9 @@ export const Record = ({ setShowAddRecordPopUp }) => {
         return [];
     }
 
-    return filterDataByDate(allTransactionData, startDate, endDate);
+    return filterDataByDate(filteredData, startDate, endDate);
   };
-
+  
   useEffect(() => {
     fetchData("category");
     fetchData("transaction");
@@ -133,6 +154,10 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     addCategoryData(selectedCategoryData);
   }, [selectedCategoryData]);
 
+  useEffect(()=>{
+    filterTransactionDataByAttribute()
+  }, [filterAttribute])
+ 
   const todayTransactionData = getTransactionDataByDateRange("today");
   const yesterdayTransactionData = getTransactionDataByDateRange("yesterday");
   const lastWeekTransactionData = getTransactionDataByDateRange("lastWeek");
@@ -163,7 +188,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             <p className="font-medium">Types</p> {" "}
             <input
               type="radio"
-              class="form-radio accent-blue-700"
+              className="form-radio accent-blue-700"
               id="all"
               value="ALL"
               checked={filterAttribute.selectedType === "ALL"}
@@ -180,7 +205,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               type="radio"
               id="income"
               value="INC"
-              class="form-radio accent-blue-700"
+              className="form-radio accent-blue-700"
               checked={filterAttribute.selectedType === "INC"}
               onChange={(e) =>
                 setFilterAttribute((prev) => ({
@@ -195,7 +220,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               type="radio"
               id="expense"
               value="EXP"
-              class="form-radio accent-blue-700"
+              className="form-radio accent-blue-700"
               checked={filterAttribute.selectedType === "EXP"}
               onChange={(e) =>
                 setFilterAttribute((prev) => ({
@@ -274,23 +299,23 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 placeholder="min"
                 className="input input-bordered w-full max-w-xs "
                 onChange={(event) => {
-                  // setFilterAttribute((prevState) => ({
-                  //   ...prevState,
-                  //   rangeLow: event.target.value,
-                  // }))
                   setMinRange(event.target.value);
+                  setFilterAttribute((prevState) => ({
+                    ...prevState,
+                    rangeLow: event.target.value,
+                  }))
                 }}
               />
               <input
                 type="number"
                 placeholder="max"
                 className="input input-bordered w-full max-w-xs"
-                onChange={(event) => {
-                  // setFilterAttribute((prevState) => ({
-                  //   ...prevState,
-                  //   rangeHigh: event.target.value,
-                  // }))
+                onChange={(event) => {                  
                   setMaxRange(event.target.value);
+                  setFilterAttribute((prevState) => ({
+                    ...prevState,
+                    rangeHigh: event.target.value,
+                  }))
                 }}
               />
             </div>

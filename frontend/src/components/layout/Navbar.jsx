@@ -43,7 +43,7 @@ export const Navbar = ({ setShowAddRecordPopUp }) => {
         <div className="flex-none items-center gap-6">
           <button
             onClick={() => setShowAddRecordPopUp(true)}
-            className="btn btn-primary btn-sm rounded-ful"
+            className="btn btn-primary btn-sm rounded-full "
           >
             {" "}
             + Record

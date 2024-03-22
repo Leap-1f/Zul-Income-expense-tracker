@@ -24,7 +24,7 @@ export const StepTwo = ({ formikAmount }) => {
           <input
             onChange={formikAmount.handleChange}
             type="text"
-            placeholder="Amount"
+            placeholder="Cash balance"
             className="input input-bordered w-full"
             name="amount"
             value={formikAmount.values.amount}

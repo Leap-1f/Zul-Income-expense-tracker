@@ -245,7 +245,6 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
                       {selectedCategory && (
                         <div className="overflow-auto">
                           {categoryData.map((element) => {
-                            console.log(element.category_image, "foreach");
                             if (
                               selectedCategoryInfo.name === element.name &&
                               selectedCategoryInfo.color ===

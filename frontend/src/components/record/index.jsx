@@ -77,8 +77,9 @@ export const Record = ({ setShowAddRecordPopUp }) => {
   const filterDataByDate = (data, startDate, endDate) => {
     return data
       ?.filter((item) => {
+        const datePart = item.transaction_date?.split('T')[0];
         const transactionDateAndTime = moment(
-          `${item.transaction_date} ${item.transaction_time}`
+          `${datePart} ${item.transaction_time}`
         ).format();
         const itemDate = new Date(transactionDateAndTime);
         return itemDate >= startDate && itemDate <= endDate;
@@ -152,7 +153,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
           now.getMonth(),
           now.getDate() - 7
         );
-        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1);
         break;
       case "lastMonth":
         startDate = new Date(
@@ -160,7 +161,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
           now.getMonth() - 1,
           now.getDate()
         );
-        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()-7);
         break;
       case "last3Months":
         startDate = new Date(
@@ -168,7 +169,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
           now.getMonth() - 3,
           now.getDate()
         );
-        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth()-1, now.getDate());
         break;
       default:
         return [];
@@ -489,8 +490,8 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               </div>
             )}
             {!isLoadingFetchAllTransactionData && (
-              <div className=" flex flex-col gap-6 overflow-auto">
-                <div className="w-full flex justify-between items-center rounded-xl h-[10%] bg-white px-4">
+              <div className=" flex flex-col overflow-auto gap-6 h-full">
+                <div className="w-full flex justify-between items-center rounded-xl bg-white px-4">
                   <div className="h-[40px] flex items-center">
                     <input type="checkbox" className="mr-3" />
                     <label htmlFor="">Select all</label>
@@ -498,7 +499,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
 
                   <p className="">35500₮</p>
                 </div>
-                <div className="flex flex-col gap-5 overflow-auto">
+                <div className="flex flex-col gap-5 overflow-auto h-full">
                   <TransactionDataByDate
                     date={"Today"}
                     transactionData={todayTransactionData}

@@ -88,6 +88,14 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
     validationSchema: amountSchema,
     onSubmit: async (values) => {
       values.switchOne = selectedValue;
+      if(values.date === "") {
+        values.date = moment().format('L'); 
+        // values.date = moment().add(1, 'days').calendar(); 
+      };
+
+      if(values.time === ""){
+        values.time = moment().format('LT')
+      }
       console.log("date, time" + values.date, values.time);
       // values.dateAndTime = values.date + "T" + values.time;
       values.dateAndTime = moment(`${values.date} ${values.time}`).format();

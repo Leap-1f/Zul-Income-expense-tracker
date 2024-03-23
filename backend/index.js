@@ -3,8 +3,7 @@ import cors from "cors";
 import { user } from "./src/router/user.js";
 import { transaction } from "./src/router/transaction.js";
 import { category } from "./src/router/category.js";
-import { login } from "./src/controller/user.js";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 
 const app = express();
 const port = 9090;

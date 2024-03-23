@@ -15,7 +15,7 @@ export const AddRecordCategory = ({
     console.log(newCategoryInfo, "addrecordCAtegory, newCategoryInfo");
   };
   const handleSelectCategory = (element) => {
-    console.log(element.name);
+    // console.log(element.name);
     setSelectedCategoryInfo({
       name: element.name,
       color: element.description,
@@ -52,7 +52,7 @@ export const AddRecordCategory = ({
               if (categoryData.length === 0) {
                 return <div>Empty</div>;
               } else {
-                console.log(iconComponentMap[element.category_image]);
+                // console.log(iconComponentMap[element.category_image]);
                 const IconComponent = iconComponentMap[element.category_image];
 
                 return (

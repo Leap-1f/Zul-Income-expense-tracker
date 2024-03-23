@@ -23,15 +23,15 @@ export const postTransaction = async (req, res) => {
     amount,
     switchOne,
     note,
-    date,
-    time,
     categoryId,
     dateAndTime,
+    date,
+    time,
   } = req.body;
   try {
     const data = await sql`SELECT * FROM transaction`;
     const newTransaction =
-      await sql`INSERT INTO transaction(name, amount, transaction_type, description, transaction_time category_id) VALUES(${payee}, ${amount}, ${switchOne}, ${note}, ${dateAndTime}, ${categoryId}) RETURNING *`;
+      await sql`INSERT INTO transaction(name, amount, transaction_type, description, transaction_time, transaction_date, category_id) VALUES(${payee}, ${amount}, ${switchOne}, ${note}, ${time}, ${date}, ${categoryId}) RETURNING *`;
     data.push(newTransaction);
     res.send(newTransaction);
   } catch (err) {

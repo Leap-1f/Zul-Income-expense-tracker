@@ -34,7 +34,7 @@ export const Dashboard = () => {
 
   // Sort the array in descending order
   allTransactionData?.sort(
-    (a, b) => new Date(b.createdat) - new Date(a.createdat)
+    (a, b) => new Date(b.transaction_time) - new Date(a.transaction_time)
   );
 
   // Get the latest 5 dates
@@ -130,7 +130,7 @@ export const Dashboard = () => {
         <div className="px-5 overflow-auto">
           {latestTenDates &&
             latestTenDates.map((element) => {
-              const date = new Date(`${element.createdat}`);
+              const date = new Date(`${element.transaction_time}`);
               const IconComponent = iconComponentMap[element.category_image];
               // getRelativeTime(date);
               return (
@@ -156,7 +156,7 @@ export const Dashboard = () => {
                       <div>
                         <p className="text-black">{element.category_name}</p>
                         <p className="text-gray-400 text-sm">
-                          {relativeTime(element.createdat)}
+                          {relativeTime(element.transaction_time)}
                         </p>
                       </div>
                     </div>

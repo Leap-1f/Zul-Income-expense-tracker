@@ -44,8 +44,11 @@ export const TransactionDataByDate = ({transactionData, date}) => {
                                     <p className="text-black">
                                       {element.category_name}
                                     </p>
+                                    {/* <p className="text-xs text-gray-400">
+                                      {extractHourMinute(element.transaction_time)}
+                                    </p> */}
                                     <p className="text-xs text-gray-400">
-                                      {extractHourMinute(element.createdat)}
+                                      {element.transaction_time}
                                     </p>
                                   </div>
                                 </div>

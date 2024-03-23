@@ -3,6 +3,7 @@ import { iconComponentMap } from "../utils/CategoryIcons";
 import { useContext } from "react";
 import { Context } from "../utils/context";
 import { TransactionDataByDate } from "./TransactionDataByDate";
+import moment from "moment";
 
 export const Record = ({ setShowAddRecordPopUp }) => {
   let { selectedCategoryData } = useContext(Context);
@@ -22,14 +23,17 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     selectedType: "ALL",
     rangeLow: minRange,
     rangeHigh: maxRange,
+    search: "",
   });
 
   const fetchData = async (endpoint) => {
     try {
-      if(endpoint === "category"){
+      if (endpoint === "category") {
         setIsLoadingFetchAllCategoryData(true);
-      } else {setIsLoadingFetchAllTransactionData(true)}
-      
+      } else {
+        setIsLoadingFetchAllTransactionData(true);
+      }
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_ENDPOINT}/api/${endpoint}`,
         {
@@ -51,10 +55,11 @@ export const Record = ({ setShowAddRecordPopUp }) => {
         setIsLoadingFetchAllCategoryData(false);
       } else if (endpoint === "transaction") {
         setAllTransactionData(res);
-        setFilteredData(res)
+        setFilteredData(res);
+
+        console.log("filtered data", filteredData);
         setIsLoadingFetchAllTransactionData(false);
       }
-     
     } catch (err) {
       console.log(err);
     }
@@ -72,27 +77,54 @@ export const Record = ({ setShowAddRecordPopUp }) => {
   const filterDataByDate = (data, startDate, endDate) => {
     return data
       ?.filter((item) => {
-        const itemDate = new Date(item.createdat);
+        const transactionDateAndTime = moment(
+          `${item.transaction_date} ${item.transaction_time}`
+        ).format();
+        const itemDate = new Date(transactionDateAndTime);
         return itemDate >= startDate && itemDate <= endDate;
       })
-      .sort((a, b) => new Date(a.createdat) - new Date(b.createdat));
+      .sort((a, b) => {
+        const aDate = moment(
+          `${a.transaction_date} ${a.transaction_time}`
+        ).format();
+        const bDate = moment(
+          `${b.transaction_date} ${b.transaction_time}`
+        ).format();
+        return new Date(aDate) - new Date(bDate);
+      });
   };
 
   const filterTransactionDataByAttribute = () => {
     let filteredDataByAttribute = allTransactionData;
-
+    if (filterAttribute.search !== "") {
+      filteredDataByAttribute = filteredDataByAttribute?.filter((item) =>
+        item.description
+          .toLowerCase()
+          .includes(filterAttribute.search.toLowerCase())
+      );
+    }
     if (filterAttribute.selectedCatId !== "") {
-       filteredDataByAttribute = filteredDataByAttribute?.filter((item) => item.category_id === filterAttribute.selectedCatId);
+      filteredDataByAttribute = filteredDataByAttribute?.filter(
+        (item) => item.category_id === filterAttribute.selectedCatId
+      );
     }
     if (filterAttribute.selectedType !== "ALL") {
-       filteredDataByAttribute = filteredDataByAttribute?.filter((item) => item.transaction_type === filterAttribute.selectedType);
+      filteredDataByAttribute = filteredDataByAttribute?.filter(
+        (item) => item.transaction_type === filterAttribute.selectedType
+      );
     }
-    if (filterAttribute.rangeLow !== null && filterAttribute.rangeHigh !== null) {
-       filteredDataByAttribute = filteredDataByAttribute?.filter((item) => item.amount >= filterAttribute.rangeLow && item.amount <= filterAttribute.rangeHigh);
+    if (
+      filterAttribute.rangeLow !== null &&
+      filterAttribute.rangeHigh !== null
+    ) {
+      filteredDataByAttribute = filteredDataByAttribute?.filter(
+        (item) =>
+          item.amount >= filterAttribute.rangeLow &&
+          item.amount <= filterAttribute.rangeHigh
+      );
     }
     setFilteredData(filteredDataByAttribute);
-    
-   };
+  };
   const getTransactionDataByDateRange = (dateRange) => {
     const now = new Date();
     let startDate, endDate;
@@ -144,7 +176,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
 
     return filterDataByDate(filteredData, startDate, endDate);
   };
-  
+
   useEffect(() => {
     fetchData("category");
     fetchData("transaction");
@@ -154,11 +186,12 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     addCategoryData(selectedCategoryData);
   }, [selectedCategoryData]);
 
-  useEffect(()=>{
-    filterTransactionDataByAttribute()
-  }, [filterAttribute])
- 
+  useEffect(() => {
+    filterTransactionDataByAttribute();
+  }, [filterAttribute]);
+
   const todayTransactionData = getTransactionDataByDateRange("today");
+  console.log(todayTransactionData, "todayTransactionData");
   const yesterdayTransactionData = getTransactionDataByDateRange("yesterday");
   const lastWeekTransactionData = getTransactionDataByDateRange("lastWeek");
   const lastMonthTransactionData = getTransactionDataByDateRange("lastMonth");
@@ -182,6 +215,12 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               type="text"
               placeholder="Search"
               className="input input-bordered w-full max-w-xs h-8"
+              onChange={(event) => {
+                setFilterAttribute((prev) => ({
+                  ...prev,
+                  search: event.target.value,
+                }));
+              }}
             />
           </div>
           <div>
@@ -303,19 +342,19 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                   setFilterAttribute((prevState) => ({
                     ...prevState,
                     rangeLow: event.target.value,
-                  }))
+                  }));
                 }}
               />
               <input
                 type="number"
                 placeholder="max"
                 className="input input-bordered w-full max-w-xs"
-                onChange={(event) => {                  
+                onChange={(event) => {
                   setMaxRange(event.target.value);
                   setFilterAttribute((prevState) => ({
                     ...prevState,
                     rangeHigh: event.target.value,
-                  }))
+                  }));
                 }}
               />
             </div>
@@ -349,7 +388,100 @@ export const Record = ({ setShowAddRecordPopUp }) => {
           </div>
         </div>
         <div className="w-[75%] rounded-xl flex flex-col gap-[1%]">
-          <div className="bg-blue-200 w-full h-[6%]"></div>
+          <div className="w-full h-[6%] flex justify-between">
+            <div className="w-[200px]">
+              <div className="carousel w-full h-full mr-10">
+                <div id="slide1" className="carousel-item relative w-full">
+                  <div className="w-full flex items-center justify-center">
+                    All
+                  </div>
+                  <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
+                    <a
+                      href="#slide4"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❮
+                    </a>
+                    <a
+                      href="#slide2"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❯
+                    </a>
+                  </div>
+                </div>
+                <div id="slide2" className="carousel-item relative w-full">
+                  <div className="w-full flex items-center justify-center">
+                    Last week
+                  </div>
+                  <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
+                    <a
+                      href="#slide1"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❮
+                    </a>
+                    <a
+                      href="#slide3"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❯
+                    </a>
+                  </div>
+                </div>
+                <div id="slide3" className="carousel-item relative w-full">
+                  <div className="w-full flex items-center justify-center">
+                    Last month
+                  </div>
+                  <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
+                    <a
+                      href="#slide2"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❮
+                    </a>
+                    <a
+                      href="#slide4"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❯
+                    </a>
+                  </div>
+                </div>
+                <div id="slide4" className="carousel-item relative w-full">
+                  <div className="w-full flex items-center justify-center">
+                    Last 3 months
+                  </div>
+                  <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
+                    <a
+                      href="#slide3"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❮
+                    </a>
+                    <a
+                      href="#slide1"
+                      className="btn btn-square scale-50 bg-gray-300"
+                    >
+                      ❯
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <p>1 selected record</p>
+              <button className="rounded-full w-[80px] bg-red-500 text-white text-sm h-[60%] active:scale-95">
+                Delete
+              </button>
+            </div>
+            <div>
+              <select className="px-5 rounded-lg border w-full h-full font-semibold">
+                <option selected>Newest first</option>
+                <option>Oldest first</option>
+              </select>
+            </div>
+          </div>
           <div className=" w-full h-[93%] flex flex-col">
             {isLoadingFetchAllTransactionData && (
               <div className="w-full h-[200px] flex justify-center items-center ">
@@ -358,8 +490,8 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             )}
             {!isLoadingFetchAllTransactionData && (
               <div className=" flex flex-col gap-6 overflow-auto">
-                <div className="w-full flex justify-between items-center rounded-xl h-[48px] bg-white px-4">
-                  <div className="">
+                <div className="w-full flex justify-between items-center rounded-xl h-[10%] bg-white px-4">
+                  <div className="h-[40px] flex items-center">
                     <input type="checkbox" className="mr-3" />
                     <label htmlFor="">Select all</label>
                   </div>

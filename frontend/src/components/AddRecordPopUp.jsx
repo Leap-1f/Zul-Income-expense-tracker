@@ -112,6 +112,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       } catch (err) {
         console.log(err);
       }
+      console.log(values);
       try {
         setIsLoading(true);
         const res = await fetch(

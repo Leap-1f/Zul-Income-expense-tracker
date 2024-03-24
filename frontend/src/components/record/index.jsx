@@ -6,7 +6,19 @@ import { TransactionDataByDate } from "./TransactionDataByDate";
 import moment from "moment";
 
 export const Record = ({ setShowAddRecordPopUp }) => {
-  let { selectedCategoryData } = useContext(Context);
+  const [filteredTransactionDataByDate, setFilteredTransactionDataByDate] =
+    useState([
+      { todayTransactionData: [] },
+      { yesterdayTransactionData: [] },
+      { lastWeekTransactionData: [] },
+      { lastMonthTransactionData: [] },
+      { last3MonthsTransactionData: [] },
+      { otherTransactionData: [] },
+    ]);
+  const [allSelected, setAllSelected] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const { newCategoryData, setNewcategoryData } = useContext(Context);
+  const [filterNewOrOld, setFilterNewOrOld] = useState("newest");
   const [minRange, setMinRange] = useState(0);
   const [maxRange, setMaxRange] = useState(100000);
   const [allCategoryData, setAllCategoryData] = useState();
@@ -49,8 +61,9 @@ export const Record = ({ setShowAddRecordPopUp }) => {
 
       if (endpoint === "category") {
         setAllCategoryData(res);
-        if (selectedCategoryData.length !== 0) {
-          addCategoryData(selectedCategoryData);
+        if (newCategoryData.length !== 0) {
+          addCategoryData(newCategoryData);
+          setNewcategoryData([]);
         }
         setIsLoadingFetchAllCategoryData(false);
       } else if (endpoint === "transaction") {
@@ -67,17 +80,17 @@ export const Record = ({ setShowAddRecordPopUp }) => {
 
   const addCategoryData = (newData) => {
     console.log(newData, "its new data");
-    allCategoryData?.push(newData);
-    // setAllCategoryData((prev) => [...prev, newData]);
+    if (allCategoryData) {
+      setAllCategoryData((prev) => [...prev, newData[0]]);
+    }
 
     console.log("its category data", allCategoryData);
   };
-  console.log(selectedCategoryData);
 
   const filterDataByDate = (data, startDate, endDate) => {
     return data
       ?.filter((item) => {
-        const datePart = item.transaction_date?.split('T')[0];
+        const datePart = item.transaction_date?.split("T")[0];
         const transactionDateAndTime = moment(
           `${datePart} ${item.transaction_time}`
         ).format();
@@ -153,7 +166,11 @@ export const Record = ({ setShowAddRecordPopUp }) => {
           now.getMonth(),
           now.getDate() - 7
         );
-        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1);
+        endDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() - 1
+        );
         break;
       case "lastMonth":
         startDate = new Date(
@@ -161,7 +178,11 @@ export const Record = ({ setShowAddRecordPopUp }) => {
           now.getMonth() - 1,
           now.getDate()
         );
-        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()-7);
+        endDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() - 7
+        );
         break;
       case "last3Months":
         startDate = new Date(
@@ -169,36 +190,148 @@ export const Record = ({ setShowAddRecordPopUp }) => {
           now.getMonth() - 3,
           now.getDate()
         );
-        endDate = new Date(now.getFullYear(), now.getMonth()-1, now.getDate());
+        endDate = new Date(
+          now.getFullYear(),
+          now.getMonth() - 1,
+          now.getDate()
+        );
+        break;
+      case "otherTransactionData":
+        startDate = new Date(
+          now.getFullYear() - 10,
+          now.getMonth(),
+          now.getDate()
+        );
+        endDate = new Date(
+          now.getFullYear(),
+          now.getMonth() - 3,
+          now.getDate()
+        );
         break;
       default:
         return [];
     }
-
+    // console.log(filterDataByDate(filteredData, startDate, endDate), "hi");
     return filterDataByDate(filteredData, startDate, endDate);
   };
 
+  const lastWeekCarousel = () => {
+    setFilteredTransactionDataByDate((prev) => ({
+      ...prev,
+      todayTransactionData: getTransactionDataByDateRange("today"),
+      yesterdayTransactionData: getTransactionDataByDateRange("yesterday"),
+      lastWeekTransactionData: getTransactionDataByDateRange("lastWeek"),
+      lastMonthTransactionData: [],
+      last3MonthsTransactionData: [],
+      otherTransactionData: [],
+    }));
+    console.log("hoosolloo");
+  };
+  const lastMonthCarousel = () => {
+    setFilteredTransactionDataByDate((prev) => ({
+      ...prev,
+      todayTransactionData: getTransactionDataByDateRange("today"),
+      yesterdayTransactionData: getTransactionDataByDateRange("yesterday"),
+      lastWeekTransactionData: getTransactionDataByDateRange("lastWeek"),
+      lastMonthTransactionData: getTransactionDataByDateRange("lastMonth"),
+      last3MonthsTransactionData: [],
+      otherTransactionData: [],
+    }));
+    console.log("hoosolloo");
+  };
+  const last3MonthsCarousel = () => {
+    setFilteredTransactionDataByDate((prev) => ({
+      ...prev,
+      todayTransactionData: getTransactionDataByDateRange("today"),
+      yesterdayTransactionData: getTransactionDataByDateRange("yesterday"),
+      lastWeekTransactionData: getTransactionDataByDateRange("lastWeek"),
+      lastMonthTransactionData: getTransactionDataByDateRange("lastMonth"),
+      last3MonthsTransactionData: getTransactionDataByDateRange("last3Months"),
+      otherTransactionData: [],
+    }));
+    console.log("hoosolloo");
+  };
+  const allCarousel = () => {
+    setFilteredTransactionDataByDate((prev) => ({
+      ...prev,
+      todayTransactionData: getTransactionDataByDateRange("today"),
+      yesterdayTransactionData: getTransactionDataByDateRange("yesterday"),
+      lastWeekTransactionData: getTransactionDataByDateRange("lastWeek"),
+      lastMonthTransactionData: getTransactionDataByDateRange("lastMonth"),
+      last3MonthsTransactionData: getTransactionDataByDateRange("last3Months"),
+      otherTransactionData: getTransactionDataByDateRange(
+        "otherTransactionData"
+      ),
+    }));
+    console.log("hoosolloo");
+  };
+  // Function to handle "Select All" checkbox change
+  const handleSelectAllChange = (event) => {
+    console.log(event.target.checked);
+    const isChecked = event.target.checked;
+    setAllSelected(isChecked);
+
+    if (!isChecked) {
+      // Select all items
+      setSelectedItems(filteredData.map((item) => item.id));
+
+      console.log(selectedItems, "all selected items");
+    } else if (isChecked) {
+      // Deselect all items
+      setSelectedItems([]);
+      console.log(selectedItems, "all selected itemssa");
+    }
+  };
+  // Function to handle individual checkbox change
+  const handleCheckboxChange = (event, itemId) => {
+    console.log(event.target.checked, "event.target.checked checkbox");
+    const isChecked = event.target.checked;
+    setSelectedItems((prev) => {
+      if (isChecked) {
+        // Add itemId to the selectedItems array
+        return [...prev, itemId];
+      } else {
+        // Remove itemId from the selectedItems array
+        return prev.filter((id) => id !== itemId);
+      }
+    });
+
+    // Update allSelected state based on the new selectedItems array
+    // setAllSelected(selectedItems.length === allTransactionData.length);
+    console.log(selectedItems, "selecteditems cehckboxchange");
+    console.log("handlecheckbox ajilchlo");
+  };
   useEffect(() => {
     fetchData("category");
     fetchData("transaction");
   }, []);
-
   useEffect(() => {
-    addCategoryData(selectedCategoryData);
-  }, [selectedCategoryData]);
+    console.log("useeffect ajillaa");
+  }, [filterNewOrOld]);
+  useEffect(() => {
+    if (filteredData) {
+      setFilteredTransactionDataByDate((prev) => ({
+        ...prev,
+        todayTransactionData: getTransactionDataByDateRange("today"),
+        yesterdayTransactionData: getTransactionDataByDateRange("yesterday"),
+        lastWeekTransactionData: getTransactionDataByDateRange("lastWeek"),
+        lastMonthTransactionData: getTransactionDataByDateRange("lastMonth"),
+        last3MonthsTransactionData:
+          getTransactionDataByDateRange("last3Months"),
+        otherTransactionData: getTransactionDataByDateRange(
+          "otherTransactionData"
+        ),
+      }));
+    }
+  }, [filteredData]);
+  useEffect(() => {
+    addCategoryData(newCategoryData);
+  }, [newCategoryData]);
 
   useEffect(() => {
     filterTransactionDataByAttribute();
-  }, [filterAttribute]);
+  }, [filterAttribute, filterAttribute.search]);
 
-  const todayTransactionData = getTransactionDataByDateRange("today");
-  console.log(todayTransactionData, "todayTransactionData");
-  const yesterdayTransactionData = getTransactionDataByDateRange("yesterday");
-  const lastWeekTransactionData = getTransactionDataByDateRange("lastWeek");
-  const lastMonthTransactionData = getTransactionDataByDateRange("lastMonth");
-  const last3MonthsTransactionData =
-    getTransactionDataByDateRange("last3Months");
-  console.log(filterAttribute, "filteredAtt");
   return (
     <div className=" bg-gray-100">
       <div className="h-[92vh] py-5 flex gap-5 max-w-screen-lg m-auto">
@@ -398,12 +531,14 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                   </div>
                   <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
                     <a
+                      onClick={last3MonthsCarousel}
                       href="#slide4"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
                       ❮
                     </a>
                     <a
+                      onClick={lastWeekCarousel}
                       href="#slide2"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
@@ -417,12 +552,14 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                   </div>
                   <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
                     <a
+                      onClick={allCarousel}
                       href="#slide1"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
                       ❮
                     </a>
                     <a
+                      onClick={lastMonthCarousel}
                       href="#slide3"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
@@ -436,12 +573,14 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                   </div>
                   <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
                     <a
+                      onClick={lastWeekCarousel}
                       href="#slide2"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
                       ❮
                     </a>
                     <a
+                      onClick={last3MonthsCarousel}
                       href="#slide4"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
@@ -455,12 +594,14 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                   </div>
                   <div className="absolute flex justify-between transform -translate-y-1/2 w-full left-0 right-0 top-1/2">
                     <a
+                      onClick={lastMonthCarousel}
                       href="#slide3"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
                       ❮
                     </a>
                     <a
+                      onClick={allCarousel}
                       href="#slide1"
                       className="btn btn-square scale-50 bg-gray-300"
                     >
@@ -477,9 +618,16 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               </button>
             </div>
             <div>
-              <select className="px-5 rounded-lg border w-full h-full font-semibold">
-                <option selected>Newest first</option>
-                <option>Oldest first</option>
+              <select
+                onChange={(event) => {
+                  setFilterNewOrOld(event.target.value);
+                }}
+                className="px-5 rounded-lg border w-full h-full font-semibold"
+              >
+                <option value={"newest"} selected>
+                  Newest first
+                </option>
+                <option value={"oldest"}>Oldest first</option>
               </select>
             </div>
           </div>
@@ -493,34 +641,109 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               <div className=" flex flex-col overflow-auto gap-6 h-full">
                 <div className="w-full flex justify-between items-center rounded-xl bg-white px-4">
                   <div className="h-[40px] flex items-center">
-                    <input type="checkbox" className="mr-3" />
+                    <input
+                      type="checkbox"
+                      className="mr-3"
+                      checked={allSelected}
+                      onChange={handleSelectAllChange}
+                    />
                     <label htmlFor="">Select all</label>
                   </div>
 
                   <p className="">35500₮</p>
                 </div>
-                <div className="flex flex-col gap-5 overflow-auto h-full">
-                  <TransactionDataByDate
-                    date={"Today"}
-                    transactionData={todayTransactionData}
-                  />
-                  <TransactionDataByDate
-                    date={"Yesterday"}
-                    transactionData={yesterdayTransactionData}
-                  />
-                  <TransactionDataByDate
-                    date={"Last week"}
-                    transactionData={lastWeekTransactionData}
-                  />
-                  <TransactionDataByDate
-                    date={"Last month"}
-                    transactionData={lastMonthTransactionData}
-                  />
-                  <TransactionDataByDate
-                    date={"Last 3 months"}
-                    transactionData={last3MonthsTransactionData}
-                  />
-                </div>
+                {filterNewOrOld === "newest" && (
+                  <div className="flex flex-col gap-5 overflow-auto h-full">
+                    <TransactionDataByDate
+                      date={"Today"}
+                      transactionData={
+                        filteredTransactionDataByDate.todayTransactionData
+                      }
+                      filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
+                    />
+                    <TransactionDataByDate
+                      date={"Yesterday"}
+                      transactionData={
+                        filteredTransactionDataByDate.yesterdayTransactionData
+                      }
+                      filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
+                    />
+                    <TransactionDataByDate
+                      date={"Last week"}
+                      transactionData={
+                        filteredTransactionDataByDate.lastWeekTransactionData
+                      }
+                      filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
+                    />
+                    <TransactionDataByDate
+                      date={"Last month"}
+                      transactionData={
+                        filteredTransactionDataByDate.lastMonthTransactionData
+                      }
+                      filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
+                    />
+                    <TransactionDataByDate
+                      date={"Last 3 months"}
+                      transactionData={
+                        filteredTransactionDataByDate.last3MonthsTransactionData
+                      }
+                      filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
+                    />
+                    <TransactionDataByDate
+                      date={"Other transaction"}
+                      transactionData={
+                        filteredTransactionDataByDate.otherTransactionData
+                      }
+                      filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
+                    />
+                  </div>
+                )}
+                {/* {filterNewOrOld === "oldest" && (
+                  <div className="flex flex-col gap-5 overflow-auto h-full">
+                    <TransactionDataByDate
+                      date={"Other transaction"}
+                      transactionData={filteredTransactionDataByDate.otherTransactionData}
+                      filterAttribute={filterAttribute}
+                    />
+                    <TransactionDataByDate
+                      date={"Last 3 months"}
+                      transactionData={filteredTransactionDataByDate.last3MonthsTransactionData}
+                      filterAttribute={filterAttribute}
+                    />
+                    <TransactionDataByDate
+                      date={"Last month"}
+                      transactionData={filteredTransactionDataByDate.lastMonthTransactionData}
+                      filterAttribute={filterAttribute}
+                    />
+                    <TransactionDataByDate
+                      date={"Last week"}
+                      transactionData={filteredTransactionDataByDate.lastWeekTransactionData}
+                      filterAttribute={filterAttribute}
+                    />
+                    <TransactionDataByDate
+                      date={"Yesterday"}
+                      transactionData={filteredTransactionDataByDate.yesterdayTransactionData}
+                      filterAttribute={filterAttribute}
+                    />
+                    <TransactionDataByDate
+                      date={"Today"}
+                      transactionData={filteredTransactionDataByDate.todayTransactionData}
+                      filterAttribute={filterAttribute}
+                    />
+                  </div>
+                )} */}
               </div>
             )}
           </div>

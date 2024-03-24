@@ -7,8 +7,11 @@ import { MdHome } from "react-icons/md";
 import { useFormik, FormikProvider } from "formik";
 import { amountSchema } from "./login/validationSchema";
 import moment from "moment";
+import { Context } from "./utils/context";
+import { useContext } from "react";
 
 export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
+  let { setNewCategoryData } = useContext(Context);
   const [selectedValue, setSelectedValue] = useState("EXP");
   const [categoryBox, setCategoryBox] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(false);
@@ -53,9 +56,10 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
 
   const addCategoryData = (newData) => {
     console.log(newData, "its new data");
+    setNewCategoryData((prev) => [...prev, newData]);
     setCategoryData((prev) => [...prev, newData]);
 
-    console.log("its category data", categoryData);
+    // console.log("its category data", categoryData);
   };
 
   useEffect(() => {
@@ -88,13 +92,13 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
     validationSchema: amountSchema,
     onSubmit: async (values) => {
       values.switchOne = selectedValue;
-      if(values.date === "") {
-        values.date = moment().format('L'); 
-        // values.date = moment().add(1, 'days').calendar(); 
-      };
+      if (values.date === "") {
+        values.date = moment().format("L");
+        // values.date = moment().add(1, 'days').calendar();
+      }
 
-      if(values.time === ""){
-        values.time = moment().format('LT')
+      if (values.time === "") {
+        values.time = moment().format("LT");
       }
       console.log("date, time" + values.date, values.time);
       // values.dateAndTime = values.date + "T" + values.time;

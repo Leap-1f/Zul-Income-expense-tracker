@@ -15,7 +15,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
       { last3MonthsTransactionData: [] },
       { otherTransactionData: [] },
     ]);
-  const [allSelected, setAllSelected] = useState(false);
+  const [allSelected, setAllSelected] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const { newCategoryData, setNewcategoryData } = useContext(Context);
   const [filterNewOrOld, setFilterNewOrOld] = useState("newest");
@@ -274,31 +274,36 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     if (!isChecked) {
       // Select all items
       setSelectedItems(filteredData.map((item) => item.id));
-
+      setAllSelected(null);
       console.log(selectedItems, "all selected items");
     } else if (isChecked) {
       // Deselect all items
       setSelectedItems([]);
-      console.log(selectedItems, "all selected itemssa");
+     
+      console.log(selectedItems, "all unselected items");
     }
   };
-  // Function to handle individual checkbox change
+
   const handleCheckboxChange = (event, itemId) => {
     console.log(event.target.checked, "event.target.checked checkbox");
     const isChecked = event.target.checked;
-    setSelectedItems((prev) => {
-      if (isChecked) {
-        // Add itemId to the selectedItems array
-        return [...prev, itemId];
-      } else {
-        // Remove itemId from the selectedItems array
-        return prev.filter((id) => id !== itemId);
-      }
-    });
+    console.log(selectedItems, "selecteditems before checkbox");
 
-    // Update allSelected state based on the new selectedItems array
-    // setAllSelected(selectedItems.length === allTransactionData.length);
-    console.log(selectedItems, "selecteditems cehckboxchange");
+        setSelectedItems((prev) => {
+          // Ensure prev is an array before attempting to filter it
+          if (!Array.isArray(prev)) {
+              console.error('prev is not an array:', prev);
+              return prev; // Return the current state if prev is not an array
+          }
+  
+          if (isChecked) {
+              return [...prev, itemId];
+          } else if (!isChecked) {
+              return prev.filter((id) => id !== itemId);
+          }
+      });
+
+    console.log(selectedItems, "selecteditems after checkbox");
     console.log("handlecheckbox ajilchlo");
   };
   useEffect(() => {
@@ -414,6 +419,24 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               )}
               {!isLoadingFetchAllCategoryData && (
                 <div className="mt-2">
+                  <div onClick={() =>
+                              setFilterAttribute((prevState) => ({
+                                ...prevState,
+                                selectedCatId: "",
+                              }))
+                            } className="flex w-full pl-1 py-2 justify-between cursor-pointer items-center rounded-md hover:bg-gray-50 active:scale-95"><p>All</p>
+                  <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M11.9167 10.5833L9.75004 12.7499C9.48615 13.0138 9.18407 13.0729 8.84379 12.927C8.50351 12.7812 8.33337 12.5208 8.33337 12.1458V7.85411C8.33337 7.47911 8.50351 7.21869 8.84379 7.07286C9.18407 6.92702 9.48615 6.98605 9.75004 7.24994L11.9167 9.41661C12 9.49994 12.0625 9.59022 12.1042 9.68744C12.1459 9.78466 12.1667 9.88883 12.1667 9.99994C12.1667 10.1111 12.1459 10.2152 12.1042 10.3124C12.0625 10.4097 12 10.4999 11.9167 10.5833Z"
+                                fill="#1C1B1F"
+                              />
+                            </svg></div>
                   {allCategoryData &&
                     allCategoryData.map((element) => {
                       if (allCategoryData.length === 0) {
@@ -461,6 +484,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                     })}
                 </div>
               )}
+              
             </div>
             {/* <button className="btn btn-ghost w-full">+ Add category</button> */}
           </div>
@@ -498,9 +522,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                   className="w-full form-radio accent-blue-700"
                   type="range"
                   min={minRange}
-                  // min={filterAttribute.rangeLow}
                   max={maxRange}
-                  // max={filterAttribute.rangeHigh}
                   step={100}
                   value={filterAttribute.rangeHigh}
                   onChange={(event) => {
@@ -508,15 +530,12 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                       ...prevState,
                       rangeHigh: event.target.valueAsNumber,
                     }));
-                    // setFilterAttribute((prev) => event.target.valueAsNumber);
                   }}
                 />
               </section>
               <div className="flex justify-between">
                 <p>{minRange}</p>
-                {/* <p>{filterAttribute.rangeLow}</p> */}
                 <p>{maxRange}</p>
-                {/* <p>{filterAttribute.rangeHigh}</p> */}
               </div>
             </div>
           </div>
@@ -624,10 +643,10 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 }}
                 className="px-5 rounded-lg border w-full h-full font-semibold"
               >
-                <option value={"newest"} selected>
+                <option value={"newest"} style={{color: "red"}} className="hover:accent-blue-700" selected>
                   Newest first
                 </option>
-                <option value={"oldest"}>Oldest first</option>
+                <option value={"oldest"} className="bg-accent-blue-700">Oldest first</option>
               </select>
             </div>
           </div>
@@ -710,40 +729,52 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                     />
                   </div>
                 )}
-                {/* {filterNewOrOld === "oldest" && (
+                {filterNewOrOld === "oldest" && (
                   <div className="flex flex-col gap-5 overflow-auto h-full">
                     <TransactionDataByDate
                       date={"Other transaction"}
                       transactionData={filteredTransactionDataByDate.otherTransactionData}
                       filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Last 3 months"}
                       transactionData={filteredTransactionDataByDate.last3MonthsTransactionData}
                       filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Last month"}
                       transactionData={filteredTransactionDataByDate.lastMonthTransactionData}
                       filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Last week"}
                       transactionData={filteredTransactionDataByDate.lastWeekTransactionData}
                       filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Yesterday"}
                       transactionData={filteredTransactionDataByDate.yesterdayTransactionData}
                       filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Today"}
                       transactionData={filteredTransactionDataByDate.todayTransactionData}
                       filterAttribute={filterAttribute}
+                      allSelected={allSelected}
+                      handleCheckboxChange={handleCheckboxChange}
                     />
                   </div>
-                )} */}
+                )}
               </div>
             )}
           </div>

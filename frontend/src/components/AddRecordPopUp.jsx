@@ -87,7 +87,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       time: "",
       payee: "",
       note: "",
-      dateAndTime: "",
+      // dateAndTime: "",
     },
     validationSchema: amountSchema,
     onSubmit: async (values) => {
@@ -102,8 +102,8 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       }
       console.log("date, time" + values.date, values.time);
       // values.dateAndTime = values.date + "T" + values.time;
-      values.dateAndTime = moment(`${values.date} ${values.time}`).format();
-      console.log(values.dateAndTime, "dateandtime");
+      // values.dateAndTime = moment(`${values.date} ${values.time}`).format();
+      // console.log(values.dateAndTime, "dateandtime");
       console.log(selectedCategoryInfo);
       try {
         const selectedCategoryId = await fetch(

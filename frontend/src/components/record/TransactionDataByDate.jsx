@@ -41,12 +41,13 @@ export const TransactionDataByDate = ({
                 <div className="flex items-center ">
                   <div className="flex items-center min-w-[240px]">
                     <input
-                      // checked={allSelected}
+                      checked={allSelected}
+                      // checked={}
                       value={element.id}
                       type="checkbox"
                       className="mr-3"
                       onChange={(event) =>
-                        handleCheckboxChange(event, element.id)
+                        handleCheckboxChange(event, element.description)
                       }
                     />
                     <div
@@ -78,7 +79,7 @@ export const TransactionDataByDate = ({
 
                   <p className="text-gray-500">
                     {filterAttribute.search === ""
-                      ? element.description
+                      ? null
                       : element.description}
                   </p>
                 </div>

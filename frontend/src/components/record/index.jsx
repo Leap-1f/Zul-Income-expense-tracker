@@ -405,7 +405,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             </button>
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search by note"
               className="input input-bordered w-full max-w-xs h-8"
               onChange={(event) => {
                 setFilterAttribute((prev) => ({
@@ -689,12 +689,12 @@ export const Record = ({ setShowAddRecordPopUp }) => {
             </div>
             <div className="flex items-center gap-3">
               <p>{selectedItems?.length} selected record</p>
-              <button
+              {/* <button
                 onClick={deleteTransactionData}
                 className="rounded-full w-[80px] bg-red-500 text-white text-sm h-[60%] active:scale-95"
               >
                 Delete
-              </button>
+              </button> */}
             </div>
             <div>
               <select
@@ -739,118 +739,154 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 </div>
                 {filterNewOrOld === "newest" && (
                   <div className="flex flex-col gap-5 overflow-auto h-full">
-                    <TransactionDataByDate
-                      date={"Today"}
-                      transactionData={
-                        filteredTransactionDataByDate.todayTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Yesterday"}
-                      transactionData={
-                        filteredTransactionDataByDate.yesterdayTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Last week"}
-                      transactionData={
-                        filteredTransactionDataByDate.lastWeekTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Last month"}
-                      transactionData={
-                        filteredTransactionDataByDate.lastMonthTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Last 3 months"}
-                      transactionData={
-                        filteredTransactionDataByDate.last3MonthsTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Other transaction"}
-                      transactionData={
-                        filteredTransactionDataByDate.otherTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
+                    {filteredTransactionDataByDate.todayTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Today"}
+                        transactionData={
+                          filteredTransactionDataByDate.todayTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.yesterdayTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Yesterday"}
+                        transactionData={
+                          filteredTransactionDataByDate.yesterdayTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.lastWeekTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Last week"}
+                        transactionData={
+                          filteredTransactionDataByDate.lastWeekTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.lastMonthTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Last month"}
+                        transactionData={
+                          filteredTransactionDataByDate.lastMonthTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.last3MonthsTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Last 3 months"}
+                        transactionData={
+                          filteredTransactionDataByDate.last3MonthsTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.otherTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Other transaction"}
+                        transactionData={
+                          filteredTransactionDataByDate.otherTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
                   </div>
                 )}
                 {filterNewOrOld === "oldest" && (
                   <div className="flex flex-col gap-5 overflow-auto h-full">
-                    <TransactionDataByDate
-                      date={"Other transaction"}
-                      transactionData={
-                        filteredTransactionDataByDate.otherTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Last 3 months"}
-                      transactionData={
-                        filteredTransactionDataByDate.last3MonthsTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Last month"}
-                      transactionData={
-                        filteredTransactionDataByDate.lastMonthTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Last week"}
-                      transactionData={
-                        filteredTransactionDataByDate.lastWeekTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Yesterday"}
-                      transactionData={
-                        filteredTransactionDataByDate.yesterdayTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
-                    <TransactionDataByDate
-                      date={"Today"}
-                      transactionData={
-                        filteredTransactionDataByDate.todayTransactionData
-                      }
-                      filterAttribute={filterAttribute}
-                      allSelected={allSelected}
-                      handleCheckboxChange={handleCheckboxChange}
-                    />
+                    {filteredTransactionDataByDate.otherTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Other transaction"}
+                        transactionData={
+                          filteredTransactionDataByDate.otherTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.last3MonthsTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Last 3 months"}
+                        transactionData={
+                          filteredTransactionDataByDate.last3MonthsTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.lastMonthTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Last month"}
+                        transactionData={
+                          filteredTransactionDataByDate.lastMonthTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.lastWeekTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Last week"}
+                        transactionData={
+                          filteredTransactionDataByDate.lastWeekTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.yesterdayTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Yesterday"}
+                        transactionData={
+                          filteredTransactionDataByDate.yesterdayTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
+                    {filteredTransactionDataByDate.todayTransactionData
+                      ?.length !== 0 && (
+                      <TransactionDataByDate
+                        date={"Today"}
+                        transactionData={
+                          filteredTransactionDataByDate.todayTransactionData
+                        }
+                        filterAttribute={filterAttribute}
+                        allSelected={allSelected}
+                        handleCheckboxChange={handleCheckboxChange}
+                      />
+                    )}
                   </div>
                 )}
               </div>

@@ -38,10 +38,12 @@ export const postTransaction = async (req, res) => {
   }
 };
 export const deleteTransaction = async (req, res) => {
-  const idList = req.body.map((id) => `'${id}'`).join(", ");
+  // const idList = req.body.map((id) => `'${id}'`).join(", ");
   try {
+    // const newTransaction = await sql`DELETE FROM transaction
+    //   WHERE id IN (${sql.raw(idList)})`;
     const newTransaction = await sql`DELETE FROM transaction
-      WHERE id IN (${sql.raw(idList)})`;
+      WHERE id IN (${req.body.id})`;
     res.send({ seccess: true });
   } catch (err) {
     console.log(err);

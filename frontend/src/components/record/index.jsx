@@ -17,7 +17,13 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     ]);
   const [allSelected, setAllSelected] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
-  const { newCategoryData, setNewcategoryData } = useContext(Context);
+  const {
+    newCategoryData,
+    setNewcategoryData,
+    newTransactionData,
+    setNewTransactionData,
+    balance,
+  } = useContext(Context);
   const [filterNewOrOld, setFilterNewOrOld] = useState("newest");
   const [minRange, setMinRange] = useState(0);
   const [maxRange, setMaxRange] = useState(100000);
@@ -39,6 +45,8 @@ export const Record = ({ setShowAddRecordPopUp }) => {
   });
 
   const fetchData = async (endpoint) => {
+    const userId = localStorage.getItem("id");
+    console.log(userId, "userid shuu");
     try {
       if (endpoint === "category") {
         setIsLoadingFetchAllCategoryData(true);
@@ -49,13 +57,14 @@ export const Record = ({ setShowAddRecordPopUp }) => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_ENDPOINT}/api/${endpoint}`,
         {
-          method: "GET",
+          method: "POST",
           cache: "no-cache",
           credentials: "same-origin",
           headers: {
             Accept: "application/json, text/plain, */*",
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ id: userId }),
         }
       ).then((res) => res.json());
 
@@ -69,6 +78,11 @@ export const Record = ({ setShowAddRecordPopUp }) => {
       } else if (endpoint === "transaction") {
         setAllTransactionData(res);
         setFilteredData(res);
+        console.log(newTransactionData, "nadaa heergtei bn");
+        if (newTransactionData.length !== 0) {
+          // addTransactionData(newTransactionData);
+          setNewTransactionData([]);
+        }
 
         console.log("filtered data", filteredData);
         setIsLoadingFetchAllTransactionData(false);
@@ -79,13 +93,19 @@ export const Record = ({ setShowAddRecordPopUp }) => {
   };
 
   const addCategoryData = (newData) => {
-    console.log(newData, "its new data");
     if (allCategoryData) {
       setAllCategoryData((prev) => [...prev, newData[0]]);
     }
-
-    console.log("its category data", allCategoryData);
   };
+  // const addTransactionData = (newData) => {
+
+  //   if (allTransactionData) {
+  //     setAllTransactionData((prev) => [...prev, newData[0]]);
+  //   }
+  //   if (filteredData) {
+  //     setFilteredData((prev) => [...prev, newData[0]]);
+  //   }
+  // };
 
   const filterDataByDate = (data, startDate, endDate) => {
     return data
@@ -271,15 +291,15 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     const isChecked = event.target.checked;
     setAllSelected(isChecked);
 
-    if (!isChecked) {
+    if (isChecked) {
       // Select all items
       setSelectedItems(filteredData.map((item) => item.id));
-      setAllSelected(null);
+
       console.log(selectedItems, "all selected items");
-    } else if (isChecked) {
+    } else if (!isChecked) {
       // Deselect all items
       setSelectedItems([]);
-     
+      setAllSelected(null);
       console.log(selectedItems, "all unselected items");
     }
   };
@@ -289,27 +309,56 @@ export const Record = ({ setShowAddRecordPopUp }) => {
     const isChecked = event.target.checked;
     console.log(selectedItems, "selecteditems before checkbox");
 
-        setSelectedItems((prev) => {
-          // Ensure prev is an array before attempting to filter it
-          if (!Array.isArray(prev)) {
-              console.error('prev is not an array:', prev);
-              return prev; // Return the current state if prev is not an array
-          }
-  
-          if (isChecked) {
-              return [...prev, itemId];
-          } else if (!isChecked) {
-              return prev.filter((id) => id !== itemId);
-          }
-      });
+    setSelectedItems((prev) => {
+      // Ensure prev is an array before attempting to filter it
+      if (!Array.isArray(prev)) {
+        console.error("prev is not an array:", prev);
+        return prev; // Return the current state if prev is not an array
+      }
+
+      if (isChecked) {
+        return [...prev, itemId];
+      } else if (!isChecked) {
+        if (allSelected) {
+          setAllSelected(null);
+          // prev.filter((id) => id !== itemId)
+          return [];
+        } else {
+          return prev.filter((id) => id !== itemId);
+        }
+      }
+    });
 
     console.log(selectedItems, "selecteditems after checkbox");
     console.log("handlecheckbox ajilchlo");
   };
+  const deleteTransactionData = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/transaction/delete`,
+        {
+          method: "POST",
+          cache: "no-cache",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(selectedItems),
+        }
+      ).then((res) => res.json());
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
     fetchData("category");
-    fetchData("transaction");
+    // fetchData("transaction");
   }, []);
+  useEffect(() => {
+    fetchData("transaction");
+  }, [newTransactionData]);
   useEffect(() => {
     console.log("useeffect ajillaa");
   }, [filterNewOrOld]);
@@ -332,6 +381,9 @@ export const Record = ({ setShowAddRecordPopUp }) => {
   useEffect(() => {
     addCategoryData(newCategoryData);
   }, [newCategoryData]);
+  // useEffect(() => {
+  //   addTransactionData(newTransactionData);
+  // }, [newTransactionData]);
 
   useEffect(() => {
     filterTransactionDataByAttribute();
@@ -377,7 +429,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 }))
               }
             />
-              <label for="all">All</label>
+              <label htmlFor="all">All</label>
             <br /> {" "}
             <input
               type="radio"
@@ -392,7 +444,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 }))
               }
             />
-              <label for="income">Income</label>
+              <label htmlFor="income">Income</label>
             <br /> {" "}
             <input
               type="radio"
@@ -407,7 +459,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 }))
               }
             />
-              <label for="expense">Expense</label>
+              <label htmlFor="expense">Expense</label>
           </div>
           <div className="h-[80%] overflow-auto">
             <p className="font-medium">Category</p>
@@ -419,24 +471,29 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               )}
               {!isLoadingFetchAllCategoryData && (
                 <div className="mt-2">
-                  <div onClick={() =>
-                              setFilterAttribute((prevState) => ({
-                                ...prevState,
-                                selectedCatId: "",
-                              }))
-                            } className="flex w-full pl-1 py-2 justify-between cursor-pointer items-center rounded-md hover:bg-gray-50 active:scale-95"><p>All</p>
-                  <svg
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M11.9167 10.5833L9.75004 12.7499C9.48615 13.0138 9.18407 13.0729 8.84379 12.927C8.50351 12.7812 8.33337 12.5208 8.33337 12.1458V7.85411C8.33337 7.47911 8.50351 7.21869 8.84379 7.07286C9.18407 6.92702 9.48615 6.98605 9.75004 7.24994L11.9167 9.41661C12 9.49994 12.0625 9.59022 12.1042 9.68744C12.1459 9.78466 12.1667 9.88883 12.1667 9.99994C12.1667 10.1111 12.1459 10.2152 12.1042 10.3124C12.0625 10.4097 12 10.4999 11.9167 10.5833Z"
-                                fill="#1C1B1F"
-                              />
-                            </svg></div>
+                  <div
+                    onClick={() =>
+                      setFilterAttribute((prevState) => ({
+                        ...prevState,
+                        selectedCatId: "",
+                      }))
+                    }
+                    className="flex w-full pl-1 py-2 justify-between cursor-pointer items-center rounded-md hover:bg-gray-50 active:scale-95"
+                  >
+                    <p>All</p>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.9167 10.5833L9.75004 12.7499C9.48615 13.0138 9.18407 13.0729 8.84379 12.927C8.50351 12.7812 8.33337 12.5208 8.33337 12.1458V7.85411C8.33337 7.47911 8.50351 7.21869 8.84379 7.07286C9.18407 6.92702 9.48615 6.98605 9.75004 7.24994L11.9167 9.41661C12 9.49994 12.0625 9.59022 12.1042 9.68744C12.1459 9.78466 12.1667 9.88883 12.1667 9.99994C12.1667 10.1111 12.1459 10.2152 12.1042 10.3124C12.0625 10.4097 12 10.4999 11.9167 10.5833Z"
+                        fill="#1C1B1F"
+                      />
+                    </svg>
+                  </div>
                   {allCategoryData &&
                     allCategoryData.map((element) => {
                       if (allCategoryData.length === 0) {
@@ -484,7 +541,6 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                     })}
                 </div>
               )}
-              
             </div>
             {/* <button className="btn btn-ghost w-full">+ Add category</button> */}
           </div>
@@ -631,8 +687,11 @@ export const Record = ({ setShowAddRecordPopUp }) => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <p>1 selected record</p>
-              <button className="rounded-full w-[80px] bg-red-500 text-white text-sm h-[60%] active:scale-95">
+              <p>{selectedItems?.length} selected record</p>
+              <button
+                onClick={deleteTransactionData}
+                className="rounded-full w-[80px] bg-red-500 text-white text-sm h-[60%] active:scale-95"
+              >
                 Delete
               </button>
             </div>
@@ -643,10 +702,16 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                 }}
                 className="px-5 rounded-lg border w-full h-full font-semibold"
               >
-                <option value={"newest"} style={{color: "red"}} className="hover:accent-blue-700" selected>
+                <option
+                  value={"newest"}
+                  className="hover:accent-blue-700"
+                  defaultValue
+                >
                   Newest first
                 </option>
-                <option value={"oldest"} className="bg-accent-blue-700">Oldest first</option>
+                <option value={"oldest"} className="bg-accent-blue-700">
+                  Oldest first
+                </option>
               </select>
             </div>
           </div>
@@ -669,7 +734,7 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                     <label htmlFor="">Select all</label>
                   </div>
 
-                  <p className="">35500₮</p>
+                  <p className="">{balance}</p>
                 </div>
                 {filterNewOrOld === "newest" && (
                   <div className="flex flex-col gap-5 overflow-auto h-full">
@@ -733,42 +798,54 @@ export const Record = ({ setShowAddRecordPopUp }) => {
                   <div className="flex flex-col gap-5 overflow-auto h-full">
                     <TransactionDataByDate
                       date={"Other transaction"}
-                      transactionData={filteredTransactionDataByDate.otherTransactionData}
+                      transactionData={
+                        filteredTransactionDataByDate.otherTransactionData
+                      }
                       filterAttribute={filterAttribute}
                       allSelected={allSelected}
                       handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Last 3 months"}
-                      transactionData={filteredTransactionDataByDate.last3MonthsTransactionData}
+                      transactionData={
+                        filteredTransactionDataByDate.last3MonthsTransactionData
+                      }
                       filterAttribute={filterAttribute}
                       allSelected={allSelected}
                       handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Last month"}
-                      transactionData={filteredTransactionDataByDate.lastMonthTransactionData}
+                      transactionData={
+                        filteredTransactionDataByDate.lastMonthTransactionData
+                      }
                       filterAttribute={filterAttribute}
                       allSelected={allSelected}
                       handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Last week"}
-                      transactionData={filteredTransactionDataByDate.lastWeekTransactionData}
+                      transactionData={
+                        filteredTransactionDataByDate.lastWeekTransactionData
+                      }
                       filterAttribute={filterAttribute}
                       allSelected={allSelected}
                       handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Yesterday"}
-                      transactionData={filteredTransactionDataByDate.yesterdayTransactionData}
+                      transactionData={
+                        filteredTransactionDataByDate.yesterdayTransactionData
+                      }
                       filterAttribute={filterAttribute}
                       allSelected={allSelected}
                       handleCheckboxChange={handleCheckboxChange}
                     />
                     <TransactionDataByDate
                       date={"Today"}
-                      transactionData={filteredTransactionDataByDate.todayTransactionData}
+                      transactionData={
+                        filteredTransactionDataByDate.todayTransactionData
+                      }
                       filterAttribute={filterAttribute}
                       allSelected={allSelected}
                       handleCheckboxChange={handleCheckboxChange}

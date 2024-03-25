@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowDropDown} from "./utils/CategoryIcons";
+import { ArrowDropDown } from "./utils/CategoryIcons";
 import { iconComponentMap } from "./utils/CategoryIcons";
 import { MdHome } from "react-icons/md";
 import { useContext } from "react";
@@ -19,7 +19,7 @@ export const AddCategoryPopUp = ({
   const [categoryIconsBox, setCategoryIconsBox] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-
+  const userId = localStorage.getItem("id");
   const handleSelectChangeToggle = () => {
     setCategoryIconsBox(!categoryIconsBox);
   };
@@ -34,7 +34,6 @@ export const AddCategoryPopUp = ({
       color: selectedColor,
     });
   }, [selectedColor]);
-
 
   const handleColorChange = (color) => {
     setSelectedColor(color);
@@ -74,7 +73,7 @@ export const AddCategoryPopUp = ({
 
   const addCategoryButton = async () => {
     setIsLoading(true);
-    // let selectedCategoryData = [];
+    console.log(newCategoryInfo, "heloo info");
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category/select-category`,
@@ -96,17 +95,19 @@ export const AddCategoryPopUp = ({
     if (selectedCategoryData.length !== 0) {
       setIsLoading(false);
       setWarningMessage("This category is registered."),
-        setNewCategoryInfo({
-          categoryName: "",
-          categoryImg: "MdHome",
-          color: "gray",
-        });
+        // setNewCategoryInfo({
+        //   categoryName: "",
+        //   categoryImg: "MdHome",
+        //   color: "gray",
+        //   id: userId,
+        // });
       selectedCategoryData = [];
       console.log(selectedCategoryData, "burtgegdsen category baina");
     } else if (selectedCategoryData.length === 0) {
       try {
+        console.log(newCategoryInfo, "helloo");
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category`,
+          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category/post-category`,
           {
             headers: {
               Accept: "application/json",

@@ -47,7 +47,7 @@ export const TransactionDataByDate = ({
                       type="checkbox"
                       className="mr-3"
                       onChange={(event) =>
-                        handleCheckboxChange(event, element.description)
+                        handleCheckboxChange(event, element.id)
                       }
                     />
                     <div

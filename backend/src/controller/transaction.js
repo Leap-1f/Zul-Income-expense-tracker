@@ -10,30 +10,39 @@ export const getAllTransaction = async (req, res) => {
         cat.name category_name, 
         cat.category_image 
       FROM transaction tar 
-        inner join category cat on tar.category_id = cat.id;`;
+        inner join category cat on tar.category_id = cat.id
+        WHERE tar.user_id = ${req.body.id};`;
     res.send(data);
   } catch (err) {
     console.log(err);
   }
 };
-
-export const postTransaction = async (req, res) => {
-  const {
-    payee,
-    amount,
-    switchOne,
-    note,
-    categoryId,
-    dateAndTime,
-    date,
-    time,
-  } = req.body;
+export const getTransactionTypeAndAmount = async (req, res) => {
   try {
-    const data = await sql`SELECT * FROM transaction`;
+    const data = await sql`SELECT transaction_type, amount FROM transaction where user_id=${req.body.id}`;
+    console.log(data);
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const postTransaction = async (req, res) => {
+  const { payee, amount, switchOne, note, categoryId, id, date, time } =
+    req.body;
+  try {
     const newTransaction =
-      await sql`INSERT INTO transaction(name, amount, transaction_type, description, transaction_time, transaction_date, category_id) VALUES(${payee}, ${amount}, ${switchOne}, ${note}, ${time}, ${date}, ${categoryId}) RETURNING *`;
-    data.push(newTransaction);
+      await sql`INSERT INTO transaction(user_id, name, amount, transaction_type, description, transaction_time, transaction_date, category_id) VALUES(${id}, ${payee}, ${amount}, ${switchOne}, ${note}, ${time}, ${date}, ${categoryId}) RETURNING *`;
     res.send(newTransaction);
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const deleteTransaction = async (req, res) => {
+  const idList = req.body.map((id) => `'${id}'`).join(", ");
+  try {
+    const newTransaction = await sql`DELETE FROM transaction
+      WHERE id IN (${sql.raw(idList)})`;
+    res.send({ seccess: true });
   } catch (err) {
     console.log(err);
   }

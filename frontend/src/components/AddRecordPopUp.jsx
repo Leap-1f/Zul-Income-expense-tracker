@@ -11,7 +11,17 @@ import { Context } from "./utils/context";
 import { useContext } from "react";
 
 export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
-  let { setNewCategoryData } = useContext(Context);
+  let {
+    setNewCategoryData,
+    newTransactionData,
+    setNewTransactionData,
+    balance,
+    setBalance,
+    totalIncAmount,
+    setTotalIncAmount,
+    totalExpAmount,
+    setTotalExpAmount,
+  } = useContext(Context);
   const [selectedValue, setSelectedValue] = useState("EXP");
   const [categoryBox, setCategoryBox] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(false);
@@ -24,26 +34,30 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
     color: "",
     image: "",
   });
+  const userId = localStorage.getItem("id");
   const [categoryData, setCategoryData] = useState([]);
   const [newCategoryInfo, setNewCategoryInfo] = useState({
     categoryName: "",
     categoryImg: MdHome.name,
     color: "gray",
+    id: userId,
   });
 
   const fetchData = async () => {
+    const userId = localStorage.getItem("id");
     setIsLoadingFetchAllCategoryData(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category`,
         {
-          method: "GET",
+          method: "POST",
           cache: "no-cache",
           credentials: "same-origin", // include, *same-origin, omit
           headers: {
             Accept: "application/json, text/plain, */*",
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ id: userId }),
         }
       ).then((res) => res.json());
 
@@ -78,6 +92,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
   const handleSelectChange = (selectedElement) => {
     setCategoryBox(!categoryBox);
   };
+  // const userId = localStorage.getItem('id')
   const formikAddRecord = useFormik({
     initialValues: {
       switchOne: selectedValue,
@@ -87,6 +102,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       time: "",
       payee: "",
       note: "",
+      id: userId,
       // dateAndTime: "",
     },
     validationSchema: amountSchema,
@@ -94,16 +110,12 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       values.switchOne = selectedValue;
       if (values.date === "") {
         values.date = moment().format("L");
-        // values.date = moment().add(1, 'days').calendar();
       }
 
       if (values.time === "") {
         values.time = moment().format("LT");
       }
       console.log("date, time" + values.date, values.time);
-      // values.dateAndTime = values.date + "T" + values.time;
-      // values.dateAndTime = moment(`${values.date} ${values.time}`).format();
-      // console.log(values.dateAndTime, "dateandtime");
       console.log(selectedCategoryInfo);
       try {
         const selectedCategoryId = await fetch(
@@ -128,7 +140,7 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/transaction`,
+          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/transaction/post-transaction`,
           {
             headers: {
               Accept: "application/json",
@@ -139,9 +151,43 @@ export const AddRecordPopUp = ({ setShowAddRecordPopUp }) => {
           }
         );
         const response = await res.json();
+        setNewTransactionData(response);
         console.log(response);
         setIsLoading(false);
         setShowAddRecordPopUp(false);
+
+        console.log(values.amount);
+        console.log(balance, "balance");
+        let balancee = Number(balance);
+        if (values.switchOne === "INC") {
+          balancee += Number(values.amount);
+          setBalance(balancee);
+          console.log(balance, "balance helloo");
+          let total = Number(totalIncAmount) + Number(values.amount);
+          setTotalIncAmount(total);
+        } else if (values.switchOne === "EXP") {
+          balancee -= Number(values.amount);
+          setBalance(balancee);
+          let total = Number(totalExpAmount) + Number(values.amount);
+          setTotalExpAmount(total);
+        }
+        console.log("---------------++++++++++", balance);
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_ENDPOINT}/api/user/postbalance`,
+            {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              method: "POST",
+              body: JSON.stringify({ balance: balancee, id: userId }),
+            }
+          );
+          const response = await res.json();
+        } catch (err) {
+          console.log(err);
+        }
       } catch (err) {
         console.log(err);
       }

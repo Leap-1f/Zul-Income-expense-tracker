@@ -12,7 +12,24 @@ export const getAllUsers = async (req, res) => {
     console.log(err);
   }
 };
-
+export const getUserBalance = async (req, res) => {
+  try {
+    const data = await sql`SELECT amount FROM users where id=${req.body.id}`;
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const postUserBalance = async (req, res) => {
+  console.log(req.body, "---------------------------");
+  try {
+    const data =
+      await sql`UPDATE users SET amount = ${req.body.balance} WHERE id = ${req.body.id}`;
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const postUser = async (req, res) => {
   try {
     const { name, password, email, currencyType, amount } = req.body;

@@ -1,10 +1,13 @@
 import { useRouter } from "next/router";
 import { Vector } from "../utils/IconGeld";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { Context } from "../utils/context";
 export const Navbar = ({ setShowAddRecordPopUp }) => {
   const {push} = useRouter();
+  const {setBalance} = useContext(Context)
   const logOut = () => {
+    setBalance("")
     localStorage.removeItem('id');
         push("/");
   }
@@ -32,11 +35,11 @@ export const Navbar = ({ setShowAddRecordPopUp }) => {
           <Vector />
           <div onClick={handleDashboard}
             href="/dashboard"
-            className="active:scale-95 transition visited:text-bold"
+            className="active:scale-95 transition visited:text-bold cursor-pointer"
           >
             Dashboard
           </div>
-          <div onClick={handleRecord} href="/record" className="active:scale-95 transition">
+          <div onClick={handleRecord} href="/record" className="cursor-pointer active:scale-95 transition">
             Records
           </div>
         </div>

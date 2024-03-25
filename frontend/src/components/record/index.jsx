@@ -70,9 +70,10 @@ export const Record = ({ setShowAddRecordPopUp }) => {
 
       if (endpoint === "category") {
         setAllCategoryData(res);
+        console.log(newCategoryData, "haai");
         if (newCategoryData.length !== 0) {
           addCategoryData(newCategoryData);
-          setNewcategoryData([]);
+          setNewcategoryData();
         }
         setIsLoadingFetchAllCategoryData(false);
       } else if (endpoint === "transaction") {

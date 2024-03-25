@@ -9,7 +9,7 @@ export const LogIn = () => {
   const { push } = useRouter();
   const [signUp, setSignUp] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-  const { signUpUserInfo, setSignUpUserInfo } = useContext(Context);
+  const { signUpUserInfo, setSignUpUserInfo, setBalance } = useContext(Context);
 
   const formikSignUp = useFormik({
     initialValues: {
@@ -76,6 +76,7 @@ export const LogIn = () => {
         console.log(response);
         if (response.success) {
           localStorage.setItem("id", response.user.id);
+          setBalance(response.user.amount)
           push("/dashboard");
         } else if (response.message === "failed") {
           setWarningMessage("Password does not match.");

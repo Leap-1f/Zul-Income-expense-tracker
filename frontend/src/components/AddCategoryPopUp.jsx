@@ -12,6 +12,8 @@ export const AddCategoryPopUp = ({
   setNewCategoryInfo,
   addCategoryData,
 }) => {
+  const ENDPOINT = process.env.NEXT_PUBLIC_ENDPOINT;
+
   const iconComponentMapArray = Object.entries(iconComponentMap);
   let { selectedCategoryData } = useContext(Context);
   const [selectedIconImage, setSelectedIconImage] = useState("MdHome");
@@ -75,17 +77,14 @@ export const AddCategoryPopUp = ({
     setIsLoading(true);
     console.log(newCategoryInfo, "heloo info");
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category/select-category`,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify(newCategoryInfo),
-        }
-      );
+      const res = await fetch(`${ENDPOINT}/api/category/select-category`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(newCategoryInfo),
+      });
       console.log(newCategoryInfo, "newcategoryInfo");
       selectedCategoryData = await res.json();
       setIsLoading(false);
@@ -101,22 +100,19 @@ export const AddCategoryPopUp = ({
         //   color: "gray",
         //   id: userId,
         // });
-      selectedCategoryData = [];
+        (selectedCategoryData = []);
       console.log(selectedCategoryData, "burtgegdsen category baina");
     } else if (selectedCategoryData.length === 0) {
       try {
         console.log(newCategoryInfo, "helloo");
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_ENDPOINT}/api/category/post-category`,
-          {
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify(newCategoryInfo),
-          }
-        );
+        const res = await fetch(`${ENDPOINT}/api/category/post-category`, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify(newCategoryInfo),
+        });
         const data = await res.json();
         addCategoryData(data[data.length - 1][0]);
       } catch (err) {
